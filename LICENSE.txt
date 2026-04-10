@@ -1,0 +1,60 @@
+CUT Geotechnical Engineering Lab Software License
+
+Copyright (c) 2026
+Lysandros Pantelidis
+Cyprus University of Technology
+
+All rights reserved.
+
+1. Scope of Use
+
+This software and associated documentation are provided exclusively for
+academic, educational, and non-commercial research purposes.
+
+Permission is granted to use the software for internal academic use,
+including research, teaching, and demonstration, provided that proper
+acknowledgment and citation of the author’s work are given.
+
+2. Restrictions
+
+The following actions are strictly prohibited without prior written
+permission from the author:
+
+- Modification, adaptation, or creation of derivative works
+- Redistribution, sharing, or publication of the software, in whole or in part
+- Commercial use, including consulting, engineering design services,
+  or incorporation into commercial software products
+- Reverse engineering or extraction of underlying algorithms for redistribution
+
+3. Intellectual Property
+
+All intellectual property rights related to the software, including
+algorithms, methodologies, formulations, and implementations,
+remain the sole property of the author.
+
+The use of the software does not grant any ownership or transfer of
+intellectual property rights.
+
+4. Citation Requirement
+
+Any use of this software in academic publications, reports, or presentations
+must be accompanied by appropriate citation of the relevant publications
+of the author.
+
+5. Disclaimer of Warranty
+
+This software is provided "as is", without warranty of any kind, express or
+implied, including but not limited to the warranties of merchantability,
+fitness for a particular purpose, and non-infringement.
+
+6. Limitation of Liability
+
+In no event shall the author be liable for any claim, damages, or other
+liability, whether in an action of contract, tort, or otherwise, arising from,
+out of, or in connection with the software or the use or other dealings in
+the software.
+
+7. Acceptance of Terms
+
+By using this software, the user acknowledges that they have read,
+understood, and agreed to the terms of this license.

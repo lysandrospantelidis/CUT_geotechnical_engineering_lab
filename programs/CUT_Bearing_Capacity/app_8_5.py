@@ -691,9 +691,18 @@ def image_to_data_uri(path: Path) -> str:
 
 
 def sidebar_home_link(path: Path, url: str) -> None:
-    if path.exists():
-        st.image(str(path), use_container_width=True)
-    st.link_button("🏠 Open CUT Apps Home", url, use_container_width=True)
+    data_uri = image_to_data_uri(path)
+    if data_uri:
+        html_block = f"""
+        <div style="text-align:center; margin-bottom: 0.75rem;">
+            <a href="{url}" target="_blank" style="display:inline-block; width:100%; max-width:220px; padding:8px; border:1px solid #cfd8e3; border-radius:12px; background:#ffffff; box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+                <img src="{data_uri}" alt="CUT Apps Home" style="width:100%; height:auto; border-radius:8px; display:block;">
+            </a>
+        </div>
+        """
+        st.markdown(html_block, unsafe_allow_html=True)
+    else:
+        st.link_button("🏠 CUT Apps Home", url, use_container_width=True)
 
 
 def build_inputs_table(inputs: Dict[str, Any]) -> pd.DataFrame:

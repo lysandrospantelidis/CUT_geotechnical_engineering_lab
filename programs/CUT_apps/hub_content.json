@@ -1,0 +1,146 @@
+{
+  "university_name": "Cyprus University of Technology",
+  "department_name": "Department of Civil Engineering and Geomatics",
+  "hub_title": "CUT Geotechnical Engineering Lab",
+  "hub_subtitle": "Central access point for the CUT geotechnical software suite.",
+  "logo_url": "https://www.cut.ac.cy/digitalAssets/441/441550_1cut_logo_rgb_english_Large.png",
+
+  "github_owner": "lysandrospantelidis",
+  "github_repo_name": "CUT_geotechnical_engineering_lab",
+  "github_branch": "main",
+  "github_repo_url": "https://github.com/lysandrospantelidis/CUT_geotechnical_engineering_lab",
+  "updates_count": 5,
+
+  "web_applications": [
+    {
+      "title": "CUT Bearing Capacity",
+      "tag": "Web application",
+      "description": "Bearing-capacity tool for shallow foundations, including soil compressibility, groundwater conditions, seismic loading, reinforcement effects, and one-layer / two-layer soil cases.",
+      "url": "https://cut-bearing-capacity.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_Bearing_capacity",
+      "asset_ext": ".exe",
+      "release_tag_contains": ""
+    },
+    {
+      "title": "CUT K Coulomb",
+      "tag": "Web application",
+      "description": "Coulomb earth-pressure tool for smooth vertical walls, developed primarily as a supporting program for CUT Bearing Capacity.",
+      "url": "https://cut-k-coulomb.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_K_Coulomb",
+      "asset_ext": ".exe",
+      "release_tag_contains": "k-coulomb"
+    }
+  ],
+
+  "desktop_programs": [
+    {
+      "title": "CUT Bearing Capacity",
+      "tag": "Windows executable (.exe)",
+      "description": "Standalone desktop version of the CUT Bearing Capacity program for local execution on Windows systems.",
+      "note": "Recommended for offline use and local distribution.",
+      "asset_name_contains": "CUT_Bearing_capacity",
+      "asset_ext": ".exe",
+      "release_tag_contains": ""
+    },
+    {
+      "title": "CUT K Coulomb",
+      "tag": "Windows executable (.exe)",
+      "description": "Standalone desktop version of the CUT K Coulomb program for local Windows use.",
+      "note": "Suitable for local classroom, lab, or office installation.",
+      "asset_name_contains": "CUT_K_Coulomb",
+      "asset_ext": ".exe",
+      "release_tag_contains": "k-coulomb"
+    }
+  ],
+
+  "documentation": [
+    {
+      "title": "CUT Bearing Capacity",
+      "tag": "Manuals / Documentation",
+      "description": "User manual, supporting documentation, and references for the CUT Bearing Capacity program.",
+      "manual_repo_folder": "programs/CUT_Bearing_Capacity",
+      "manual_file_contains": "CUT_Bearing_Capacity_User_Manual",
+      "asset_name_contains": "CUT_Bearing_capacity",
+      "asset_ext": ".exe",
+      "release_tag_contains": "",
+      "references": [
+        {
+          "text": "Pantelidis, L. (2023). Bearing capacity of centrically-vertically loaded strip foundations based on soil parameters: A classical earth pressure analysis problem. Research Square (Preprint, Version 2)."
+        },
+        {
+          "text": "Pantelidis, L. (2024). Bearing capacity of shallow foundations: A focus on the depth factors in combination with the respective N-factors. Arabian Journal of Geosciences, 17(6), 169."
+        },
+        {
+          "text": "Pantelidis, L. (2026). Unified pseudo-static seismic reduction factors for shallow foundations via an earth-pressure framework. Soils and Foundations, 66(1), 101713."
+        },
+        {
+          "text": "Pantelidis, L., & Meddah, A. (2024). The effect of loading inclination and eccentricity on the bearing capacity of shallow foundations: A review. Archives of Computational Methods in Engineering, 31(7), 4189–4208."
+        },
+        {
+          "text": "Pantelidis, L., & Meddah, A. (2026). Theoretical investigation of the effect of soil compressibility in the context of the bearing capacity of shallow foundations. Proceedings of the 21st International Conference on Soil Mechanics and Geotechnical Engineering, Vienna, Austria."
+        },
+        {
+          "text": "Pantelidis, L., Assefa, E., & Sachpazis, C. I. (2025). The effect of footing shape on the bearing capacity of shallow foundations: A review. Archives of Computational Methods in Engineering."
+        },
+        {
+          "text": "Pantelidis, L., Assefa, E., & Sachpazis, C. (2026). The effect of groundwater table on the bearing capacity of shallow foundations: An earth pressure analysis approach. Proceedings of the 21st International Conference on Soil Mechanics and Geotechnical Engineering, Vienna, Austria."
+        }
+      ]
+    },
+    {
+      "title": "CUT K Coulomb",
+      "tag": "Manuals / Documentation",
+      "description": "User manual, supporting documentation, and references for the CUT K Coulomb program.",
+      "manual_repo_folder": "",
+      "manual_file_contains": "",
+      "asset_name_contains": "CUT_K_Coulomb",
+      "asset_ext": ".exe",
+      "release_tag_contains": "k-coulomb",
+      "references": [
+        {
+          "text": "Classical Coulomb earth-pressure theory and related developments in geotechnical engineering literature."
+        }
+      ]
+    }
+  ],
+
+  "software_citations": [
+    {
+      "title": "CUT Bearing Capacity",
+      "software_citation": "Pantelidis, L. CUT Bearing Capacity [Software]. Cyprus University of Technology.",
+      "software_citation_bibtex": "@misc{PantelidisCUTBearingCapacity,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT Bearing Capacity},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
+    },
+    {
+      "title": "CUT K Coulomb",
+      "software_citation": "Pantelidis, L. CUT K Coulomb [Software]. Cyprus University of Technology.",
+      "software_citation_bibtex": "@misc{PantelidisCUTKCoulomb,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT K Coulomb},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
+    }
+  ],
+
+  "contact_links": [
+    {
+      "label": "University Profile",
+      "url": "https://www.cut.ac.cy/faculties/fet/ceg/staff/lysandros.pantelidis/?languageId=1"
+    },
+    {
+      "label": "Google Scholar",
+      "url": "https://scholar.google.com/citations?user=u5fbtlcAAAAJ&hl=en"
+    },
+    {
+      "label": "ResearchGate",
+      "url": "https://www.researchgate.net/profile/Lysandros-Pantelidis"
+    },
+    {
+      "label": "ORCID",
+      "url": "https://orcid.org/0000-0001-5979-6937"
+    },
+    {
+      "label": "Personal Website",
+      "url": "https://lysandros.weebly.com/"
+    }
+  ],
+
+  "share_url": "https://cut-apps.streamlit.app/"
+}

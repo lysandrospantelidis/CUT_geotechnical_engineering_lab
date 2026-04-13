@@ -18,7 +18,7 @@
       "title": "CUT Bearing Capacity",
       "tag": "Web application",
       "description": "Bearing-capacity tool for shallow foundations, including soil compressibility, groundwater conditions, seismic loading, reinforcement effects, and one-layer / two-layer soil cases.",
-      "url": "https://cut-bearing-capacity.streamlit.app/",
+      "url": "https://cut-bearing-capacity-v85.streamlit.app/",
       "note": "Suitable for desktop and mobile access.",
       "asset_name_contains": "CUT_Bearing_capacity",
       "asset_ext": ".exe",

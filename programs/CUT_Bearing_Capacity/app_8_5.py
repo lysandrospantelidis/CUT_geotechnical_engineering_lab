@@ -24,7 +24,7 @@ BRAND_FILE = BASE_DIR / "Cut bearing capacity.png"
 HOME_LOGO_FILE = BASE_DIR / "home.png"
 HOME_URL = "https://cut-apps.streamlit.app/"
 
-CUT_EXE_URL = "https://github.com/lysandrospantelidis/CUT_geotechnical_engineering_lab/releases/download/v7.1/CUT_Bearing_capacity_updated_v8.5.exe"
+CUT_EXE_URL = "https://github.com/lysandrospantelidis/CUT_geotechnical_engineering_lab/releases/download/v8.5/CUT_Bearing_capacity_updated_v8.5.exe"
 COULOMB_EXE_URL = "https://github.com/lysandrospantelidis/CUT_geotechnical_engineering_lab/releases/download/v1.0.0-k-coulomb/CUT_K_Coulomb.exe"
 
 ABOUT_TEXT = """CUT_Bearing_capacity

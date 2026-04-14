@@ -21,6 +21,7 @@ st.set_page_config(
 # -------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent
 CONFIG_FILE = BASE_DIR / "hub_content.json"
+HOME_LOGO_FILE = BASE_DIR / "home.png"
 
 if not CONFIG_FILE.exists():
     st.error(f"Configuration file not found: {CONFIG_FILE.name}")

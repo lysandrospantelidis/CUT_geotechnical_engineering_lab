@@ -754,21 +754,16 @@ https://cut-apps.streamlit.app/"""
 
         with col1:
             st.link_button("WhatsApp", wa_url, use_container_width=True)
-
         with col2:
             st.link_button("Email", email_url, use_container_width=True)
-
         with col3:
             st.link_button("LinkedIn", share_links["LinkedIn"], use_container_width=True)
-
         with col4:
             st.link_button("Facebook", share_links["Facebook"], use_container_width=True)
-
         with col5:
             st.link_button("Twitter/X", share_links["Twitter/X"], use_container_width=True)
 
         st.markdown("#### or")
-
         st.text_area("Copy message", share_text, height=80)
 
         st.markdown("---")

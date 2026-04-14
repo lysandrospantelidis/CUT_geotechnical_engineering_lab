@@ -1,4 +1,3 @@
-import base64
 import json
 import re
 from datetime import datetime
@@ -22,7 +21,6 @@ st.set_page_config(
 # -------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent
 CONFIG_FILE = BASE_DIR / "hub_content.json"
-HOME_LOGO_FILE = BASE_DIR / "home.png"
 
 if not CONFIG_FILE.exists():
     st.error(f"Configuration file not found: {CONFIG_FILE.name}")
@@ -744,6 +742,7 @@ with tab6:
 https://cut-apps.streamlit.app/"""
 
         encoded = quote(share_text, safe="")
+
         wa_url = f"https://wa.me/?text={encoded}"
         email_url = f"mailto:?subject=CUT Apps&body={encoded}"
 
@@ -755,43 +754,29 @@ https://cut-apps.streamlit.app/"""
 
         with col1:
             st.link_button("WhatsApp", wa_url, use_container_width=True)
+
         with col2:
             st.link_button("Email", email_url, use_container_width=True)
+
         with col3:
             st.link_button("LinkedIn", share_links["LinkedIn"], use_container_width=True)
+
         with col4:
             st.link_button("Facebook", share_links["Facebook"], use_container_width=True)
+
         with col5:
             st.link_button("Twitter/X", share_links["Twitter/X"], use_container_width=True)
 
         st.markdown("#### or")
+
         st.text_area("Copy message", share_text, height=80)
 
-        st.markdown("---")
-        st.markdown("### 🏠 CUT Apps Home")
-
-        if HOME_LOGO_FILE.exists():
-            home_b64 = base64.b64encode(HOME_LOGO_FILE.read_bytes()).decode()
-            st.markdown(
-                f"""
-                <div style="text-align:center; margin-top:0.5rem;">
-                    <a href="{SHARE_URL}" target="_blank" style="display:inline-block; max-width:320px; width:100%;">
-                        <img src="data:image/png;base64,{home_b64}"
-                             alt="CUT Apps Home"
-                             style="width:100%; height:auto; border-radius:18px; border:1px solid rgba(0,59,113,0.12); box-shadow:0 8px 22px rgba(17,36,56,0.08);">
-                    </a>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-        else:
-            st.link_button("Open CUT Apps Home", SHARE_URL, use_container_width=True)
+        render_qr_block("CUT Apps Hub", SHARE_URL)
 
     else:
         st.info("Share URL not configured.")
 
     st.markdown("</div>", unsafe_allow_html=True)
-
 with tab7:
     st.markdown(
         '<div class="section-intro">Contact information and academic profiles.</div>',

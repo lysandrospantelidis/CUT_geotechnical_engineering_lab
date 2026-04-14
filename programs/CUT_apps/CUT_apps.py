@@ -742,7 +742,6 @@ with tab6:
 https://cut-apps.streamlit.app/"""
 
         encoded = quote(share_text, safe="")
-
         wa_url = f"https://wa.me/?text={encoded}"
         email_url = f"mailto:?subject=CUT Apps&body={encoded}"
 
@@ -771,7 +770,25 @@ https://cut-apps.streamlit.app/"""
 
         st.text_area("Copy message", share_text, height=80)
 
-        render_qr_block("CUT Apps Hub", SHARE_URL)
+        st.markdown("---")
+        st.markdown("### 🏠 CUT Apps Home")
+
+        if HOME_LOGO_FILE.exists():
+            home_b64 = base64.b64encode(HOME_LOGO_FILE.read_bytes()).decode()
+            st.markdown(
+                f"""
+                <div style="text-align:center; margin-top:0.5rem;">
+                    <a href="{SHARE_URL}" target="_blank" style="display:inline-block; max-width:320px; width:100%;">
+                        <img src="data:image/png;base64,{home_b64}"
+                             alt="CUT Apps Home"
+                             style="width:100%; height:auto; border-radius:18px; border:1px solid rgba(0,59,113,0.12); box-shadow:0 8px 22px rgba(17,36,56,0.08);">
+                    </a>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        else:
+            st.link_button("Open CUT Apps Home", SHARE_URL, use_container_width=True)
 
     else:
         st.info("Share URL not configured.")

@@ -742,21 +742,37 @@ with tab6:
 https://cut-apps.streamlit.app/"""
 
         encoded = quote(share_text, safe="")
+
         wa_url = f"https://wa.me/?text={encoded}"
         email_url = f"mailto:?subject=CUT Apps&body={encoded}"
 
-        st.markdown("### 📲 Quick Share")
+        share_links = build_share_links(SHARE_URL)
 
-        col1, col2 = st.columns(2)
+        st.markdown("### 📲 Share CUT Apps")
+
+        col1, col2, col3, col4, col5 = st.columns(5)
+
         with col1:
             st.link_button("WhatsApp", wa_url, use_container_width=True)
+
         with col2:
             st.link_button("Email", email_url, use_container_width=True)
 
+        with col3:
+            st.link_button("LinkedIn", share_links["LinkedIn"], use_container_width=True)
+
+        with col4:
+            st.link_button("Facebook", share_links["Facebook"], use_container_width=True)
+
+        with col5:
+            st.link_button("Twitter/X", share_links["Twitter/X"], use_container_width=True)
+
         st.markdown("#### or")
+
         st.text_area("Copy message", share_text, height=80)
 
         render_qr_block("CUT Apps Hub", SHARE_URL)
+
     else:
         st.info("Share URL not configured.")
 

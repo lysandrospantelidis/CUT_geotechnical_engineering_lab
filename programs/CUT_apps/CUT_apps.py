@@ -737,29 +737,24 @@ with tab6:
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<div class="card-title">Share this platform</div>', unsafe_allow_html=True)
 
-import urllib.parse
-
-share_text = """CUT Apps – Geotechnical engineering tools (bearing capacity, earth pressures & more):
+    if SHARE_URL:
+        share_text = """CUT Apps – Geotechnical engineering tools (bearing capacity, earth pressures & more):
 https://cut-apps.streamlit.app/"""
 
-encoded = urllib.parse.quote(share_text)
+        encoded = quote(share_text, safe="")
+        wa_url = f"https://wa.me/?text={encoded}"
+        email_url = f"mailto:?subject=CUT Apps&body={encoded}"
 
-wa_url = f"https://wa.me/?text={encoded}"
-email_url = f"mailto:?subject=CUT Apps&body={encoded}"
+        st.markdown("### 📲 Quick Share")
 
-st.markdown("### 📲 Quick Share")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.link_button("WhatsApp", wa_url, use_container_width=True)
+        with col2:
+            st.link_button("Email", email_url, use_container_width=True)
 
-col1, col2 = st.columns(2)
-
-with col1:
-    st.link_button("WhatsApp", wa_url, use_container_width=True)
-
-with col2:
-    st.link_button("Email", email_url, use_container_width=True)
-
-st.markdown("#### or")
-
-st.text_area("Copy message", share_text, height=80)
+        st.markdown("#### or")
+        st.text_area("Copy message", share_text, height=80)
 
         render_qr_block("CUT Apps Hub", SHARE_URL)
     else:

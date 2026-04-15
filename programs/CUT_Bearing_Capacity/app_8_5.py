@@ -932,8 +932,8 @@ with header_cols[1]:
     st.title(APP_TITLE)
     st.caption("Version: v8.5 (Program), v3 (Manual)")
 
-CUT_EXE_URL = "https://github.com/lysandrospantelidis/CUT_geotechnical_engineering_lab/releases/download/v7.1/CUT_Bearing_capacity_updated_v7_2.exe"
-COULOMB_EXE_URL = "https://github.com/lysandrospantelidis/CUT_geotechnical_engineering_lab/releases/download/v1.0.0-k-coulomb/CUT_K_Coulomb.exe"
+CUT_EXE_URL = "https://github.com/lysandrospantelidis/CUT_geotechnical_engineering_lab/releases/download/v7.1/CUT_Bearing_capacity_updated_v8.5.exe"
+COULOMB_EXE_URL = "https://github.com/lysandrospantelidis/CUT_geotechnical_engineering_lab/releases/download/cut-k-coulomb-v2/CUT_K_Coulomb_v2.exe"
 
 compute_col1, compute_col2, compute_col3 = st.columns([1, 1, 1])
 with compute_col1:

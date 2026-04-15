@@ -28,7 +28,7 @@
       "title": "CUT K Coulomb",
       "tag": "Web application",
       "description": "Coulomb earth-pressure tool for smooth vertical walls, developed primarily as a supporting program for CUT Bearing Capacity.",
-      "url": "https://cut-k-coulomb.streamlit.app/",
+      "url": "https://cut-k-coulomb-v2a.streamlit.app/",
       "note": "Suitable for desktop and mobile access.",
       "asset_name_contains": "CUT_K_Coulomb",
       "asset_ext": ".exe",

@@ -998,11 +998,8 @@ class App(ttk.Frame):
             except Exception as e:
                 messagebox.showerror("Error", f"Unable to open CUT_Bearing_Capacity_User_Manual_v3.pdf: {e}")
 
-        def open_home():
-            webbrowser.open("https://cut-apps.streamlit.app/")
-
-            except Exception as e:
-                messagebox.showerror("Error", f"Unable to open integrated CUT_K_Coulomb:\n{e}")
+        def open_cut_k_coulomb():
+            webbrowser.open("https://cut-k-coulomb.streamlit.app/")
 
         def open_home():
             webbrowser.open("https://cut-apps.streamlit.app/")

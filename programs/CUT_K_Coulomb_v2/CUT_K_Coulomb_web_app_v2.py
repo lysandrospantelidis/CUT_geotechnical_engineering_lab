@@ -11,7 +11,7 @@ import pandas as pd
 import streamlit as st
 
 PROGRAM_NAME = "CUT_K_Coulomb"
-VERSION = "v1.2.1 (Web)"
+VERSION = "v2.0.0 (Web)"
 AUTHOR = "Dr Lysandros Pantelidis, Cyprus University of Technology"
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -376,8 +376,8 @@ st.markdown(
     """
     <style>
     div.stButton > button {
-        min-height: 58px !important;
-        height: 58px !important;
+        min-height: 52px !important;
+        height: 52px !important;
         border-radius: 12px !important;
         white-space: nowrap !important;
         font-weight: 600 !important;
@@ -393,6 +393,9 @@ st.markdown(
         border-color: #b71c1c !important;
         color: white !important;
     }
+    div[data-testid="stNumberInput"] button {display:none !important;}
+    div[data-testid="stNumberInput"] input {text-align:left;}
+    div[data-testid="stCheckbox"] {max-width: 100%;}
     .toolbar-home-wrap {
         padding-top: 0px;
     }
@@ -401,8 +404,7 @@ st.markdown(
         align-items:center;
         justify-content:center;
         width:100%;
-        max-width:110px;
-        height:58px;
+        height:52px;
         border:1px solid #cfd8e3;
         border-radius:12px;
         background:#ffffff;
@@ -410,14 +412,29 @@ st.markdown(
         text-decoration:none;
     }
     .toolbar-home-img {
-        max-width:54px;
-        max-height:42px;
+        width: 90%;
+        height: 90%;
+        object-fit: contain;
         display:block;
     }
-    div[data-testid="stNumberInput"] button {display:none !important;}
-    div[data-testid="stNumberInput"] input {text-align:left;}
-    div[data-testid="stNumberInput"], div[data-testid="stSelectbox"] {max-width: 138px;}
-    div[data-testid="stCheckbox"] {max-width: 100%;}
+    .point-row {
+        border: 1px solid #d9dce3;
+        border-radius: 10px;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        background: #fafbfc;
+    }
+    .point-label {
+        font-weight: 600;
+        margin-top: 0.35rem;
+    }
+    .points-header {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+    @media (max-width: 900px) {
+        div[data-testid="stNumberInput"], div[data-testid="stSelectbox"] {max-width: 100% !important;}
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -426,8 +443,8 @@ st.markdown(
     """
     <style>
     div.stButton > button {
-        min-height: 58px !important;
-        height: 58px !important;
+        min-height: 52px !important;
+        height: 52px !important;
         border-radius: 12px !important;
         white-space: nowrap !important;
         font-weight: 600 !important;
@@ -443,6 +460,9 @@ st.markdown(
         border-color: #b71c1c !important;
         color: white !important;
     }
+    div[data-testid="stNumberInput"] button {display:none !important;}
+    div[data-testid="stNumberInput"] input {text-align:left;}
+    div[data-testid="stCheckbox"] {max-width: 100%;}
     .toolbar-home-wrap {
         padding-top: 0px;
     }
@@ -451,8 +471,7 @@ st.markdown(
         align-items:center;
         justify-content:center;
         width:100%;
-        max-width:110px;
-        height:58px;
+        height:52px;
         border:1px solid #cfd8e3;
         border-radius:12px;
         background:#ffffff;
@@ -460,14 +479,29 @@ st.markdown(
         text-decoration:none;
     }
     .toolbar-home-img {
-        max-width:54px;
-        max-height:42px;
+        width: 90%;
+        height: 90%;
+        object-fit: contain;
         display:block;
     }
-    div[data-testid="stNumberInput"] button {display:none !important;}
-    div[data-testid="stNumberInput"] input {text-align:left;}
-    div[data-testid="stNumberInput"], div[data-testid="stSelectbox"] {max-width: 138px;}
-    div[data-testid="stCheckbox"] {max-width: 100%;}
+    .point-row {
+        border: 1px solid #d9dce3;
+        border-radius: 10px;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        background: #fafbfc;
+    }
+    .point-label {
+        font-weight: 600;
+        margin-top: 0.35rem;
+    }
+    .points-header {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+    @media (max-width: 900px) {
+        div[data-testid="stNumberInput"], div[data-testid="stSelectbox"] {max-width: 100% !important;}
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -486,29 +520,27 @@ with header_cols[1]:
     st.title(PROGRAM_NAME)
     st.caption(f"{VERSION} — {AUTHOR}")
 
-topbar1, topbar2, topbar3, _ = st.columns([0.34, 0.34, 0.52, 2.8], gap="small")
-
-with topbar1:
-    if HOME_LOGO_FILE.exists():
-        data_uri = image_to_data_uri(HOME_LOGO_FILE)
-        st.markdown(
-            f"""
-            <div class="toolbar-home-wrap">
-                <a href="{HOME_URL}" target="_blank" class="toolbar-home-btn">
-                    <img src="{data_uri}" alt="CUT Apps Home" class="toolbar-home-img">
-                </a>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    else:
-        st.link_button("Home", HOME_URL, use_container_width=True)
-
-with topbar2:
-    if st.button("About", use_container_width=True):
-        st.session_state["show_about"] = not st.session_state.get("show_about", False)
-
-with topbar3:
+toolbar_col, _ = st.columns([1.15, 2.85], gap="small")
+with toolbar_col:
+    tb1, tb2 = st.columns(2, gap="small")
+    with tb1:
+        if HOME_LOGO_FILE.exists():
+            data_uri = image_to_data_uri(HOME_LOGO_FILE)
+            st.markdown(
+                f"""
+                <div class="toolbar-home-wrap">
+                    <a href="{HOME_URL}" target="_blank" class="toolbar-home-btn">
+                        <img src="{data_uri}" alt="CUT Apps Home" class="toolbar-home-img">
+                    </a>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        else:
+            st.link_button("Home", HOME_URL, use_container_width=True)
+    with tb2:
+        if st.button("About", use_container_width=True):
+            st.session_state["show_about"] = not st.session_state.get("show_about", False)
     run = st.button("Compute", type="primary", use_container_width=True)
 
 if st.session_state.get("show_about", False):
@@ -521,25 +553,28 @@ col_inputs1, col_inputs2, col_plot = st.columns([0.50, 1.22, 1.8], gap="medium")
 with col_inputs1:
     st.subheader("Inputs")
 
-    mode = st.selectbox("Mode", ["active", "passive"], index=0)
-    phi = st.number_input("φ (deg)", min_value=0.001, max_value=89.999, value=30.0, step=1.0, format="%.1f")
-    H = st.number_input("H (m)", min_value=0.001, value=6.0, step=0.5, format="%.1f")
-
-    if use_for_bearing:
-        alpha = 0.0
-        delta_w = 0.0
-        st.number_input("α (deg)", value=alpha, disabled=True, format="%.1f")
-        st.number_input("δw (deg)", value=delta_w, disabled=True, format="%.1f")
-    else:
-        alpha = st.number_input("α (deg)", value=0.0, step=1.0, format="%.1f")
-        delta_w = st.number_input("δw (deg)", value=0.0, step=1.0, format="%.1f")
-
-    n_steps = st.number_input("Sweep", min_value=100, value=12000, step=100, format="%d")
+    i1, i2 = st.columns(2, gap="small")
+    with i1:
+        mode = st.selectbox("Mode", ["active", "passive"], index=0)
+        phi = st.number_input("φ (deg)", min_value=0.001, max_value=89.999, value=30.0, step=1.0, format="%.1f")
+        if use_for_bearing:
+            alpha = 0.0
+            st.number_input("α (deg)", value=alpha, disabled=True, format="%.1f")
+        else:
+            alpha = st.number_input("α (deg)", value=0.0, step=1.0, format="%.1f")
+    with i2:
+        H = st.number_input("H (m)", min_value=0.001, value=6.0, step=0.5, format="%.1f")
+        if use_for_bearing:
+            delta_w = 0.0
+            st.number_input("δw (deg)", value=delta_w, disabled=True, format="%.1f")
+        else:
+            delta_w = st.number_input("δw (deg)", value=0.0, step=1.0, format="%.1f")
+        n_steps = st.number_input("Sweep", min_value=100, value=12000, step=100, format="%d")
 
 with col_inputs2:
     st.subheader("Points")
 
-    act1, act2 = st.columns([1, 1], gap="small")
+    act1, act2 = st.columns(2, gap="small")
     with act1:
         st.button("Add Point", on_click=add_point, use_container_width=True)
     with act2:
@@ -548,14 +583,15 @@ with col_inputs2:
     sync_points_from_widgets()
     current_df = normalize_points_df(st.session_state.points_df)
 
-    h1, h2, h3, h4 = st.columns([0.14, 0.36, 0.25, 0.25], gap="small")
-    h1.markdown("**Sel**")
-    h2.markdown("**Point**")
-    h3.markdown("**x**")
-    h4.markdown("**y**")
+    h1, h2, h3, h4 = st.columns([0.18, 0.34, 0.24, 0.24], gap="small")
+    h1.markdown('<div class="points-header">Sel</div>', unsafe_allow_html=True)
+    h2.markdown('<div class="points-header">Point</div>', unsafe_allow_html=True)
+    h3.markdown('<div class="points-header">x</div>', unsafe_allow_html=True)
+    h4.markdown('<div class="points-header">y</div>', unsafe_allow_html=True)
 
     for i in range(len(current_df)):
-        c1, c2, c3, c4 = st.columns([0.14, 0.36, 0.25, 0.25], gap="small")
+        st.markdown('<div class="point-row">', unsafe_allow_html=True)
+        c1, c2, c3, c4 = st.columns([0.18, 0.34, 0.24, 0.24], gap="small")
         with c1:
             st.checkbox(
                 f"sel_{i}",
@@ -564,7 +600,7 @@ with col_inputs2:
                 disabled=(i == 0),
             )
         with c2:
-            st.markdown(f"Point {i}")
+            st.markdown(f'<div class="point-label">Point {i}</div>', unsafe_allow_html=True)
         with c3:
             st.number_input(
                 f"x_{i}",
@@ -585,6 +621,7 @@ with col_inputs2:
                 label_visibility="collapsed",
                 disabled=(i == 0),
             )
+        st.markdown('</div>', unsafe_allow_html=True)
 
     sync_points_from_widgets()
 

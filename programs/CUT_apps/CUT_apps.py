@@ -788,7 +788,7 @@ with tab7:
     )
 
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<div class="card-title">Academic Profiles</div>', unsafe_allow_html=True)
+    st.markdown('<div class="card-title">Associate Professor Lysandros Pantelidis</div>', unsafe_allow_html=True)
 
     for item in cfg.get("contact_links", []):
         label = item.get("label", "").strip()

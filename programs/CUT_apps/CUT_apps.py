@@ -648,13 +648,14 @@ st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 # -------------------------------------------------
 # TABS
 # -------------------------------------------------
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "Web Applications",
     "Desktop Programs (.exe)",
     "Manuals / Documentation",
     "Release Links",
     "About / Citation",
     "Share",
+    "Profile",
     "Contact"
 ])
 
@@ -782,35 +783,37 @@ https://cut-apps.streamlit.app/"""
     
 with tab7:
     st.markdown(
-        '<div class="section-intro">Contact information and academic profiles.</div>',
+        '<div class="section-intro">Academic profiles and external links.</div>',
         unsafe_allow_html=True,
     )
 
-    left, right = st.columns([1.1, 1], gap="large")
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="card-title">Academic Profiles</div>', unsafe_allow_html=True)
 
-    with left:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<div class="card-title">Contact Information</div>', unsafe_allow_html=True)
+    for item in cfg.get("contact_links", []):
+        label = item.get("label", "").strip()
+        url = item.get("url", "").strip()
+        if label and url:
+            st.link_button(label, url, use_container_width=True)
 
-        contact_text = get_str("contact_text")
-        if contact_text:
-            st.markdown(
-                f'<div class="footer-text">{contact_text}</div>',
-                unsafe_allow_html=True,
-            )
-        else:
-            st.info("Contact information not configured.")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-        st.markdown("</div>", unsafe_allow_html=True)
+with tab8:
+    st.markdown(
+        '<div class="section-intro">Contact information.</div>',
+        unsafe_allow_html=True,
+    )
 
-    with right:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<div class="card-title">Academic Profiles</div>', unsafe_allow_html=True)
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="card-title">Contact Information</div>', unsafe_allow_html=True)
 
-        for item in cfg.get("contact_links", []):
-            label = item.get("label", "").strip()
-            url = item.get("url", "").strip()
-            if label and url:
-                st.link_button(label, url, use_container_width=True)
+    contact_text = get_str("contact_text")
+    if contact_text:
+        st.markdown(
+            f'<div class="footer-text">{contact_text}</div>',
+            unsafe_allow_html=True,
+        )
+    else:
+        st.info("Contact information not configured.")
 
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)

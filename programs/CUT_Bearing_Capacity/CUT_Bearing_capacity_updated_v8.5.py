@@ -999,7 +999,19 @@ class App(ttk.Frame):
                 messagebox.showerror("Error", f"Unable to open CUT_Bearing_Capacity_User_Manual_v3.pdf: {e}")
 
         def open_cut_k_coulomb():
-            webbrowser.open("https://cut-k-coulomb.streamlit.app/")
+            try:
+                import tkinter as tk
+                import CUT_K_Coulomb as ck   # integrated module
+
+                # Create a new child window of the main app
+                win = tk.Toplevel(self.winfo_toplevel())
+                win.title("CUT_K_Coulomb")
+
+                # Launch the CUT_K_Coulomb UI in that window
+                ck.App(win)
+
+            except Exception as e:
+                messagebox.showerror("Error", f"Unable to open integrated CUT_K_Coulomb:\n{e}")
 
         def open_home():
             webbrowser.open("https://cut-apps.streamlit.app/")

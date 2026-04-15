@@ -69,10 +69,25 @@
       "release_tag_contains": "",
       "references": [
         {
-          "text": "Pantelidis, L. (2023). Bearing capacity of centrically-vertically loaded strip foundations based on soil parameters: A classical earth pressure analysis problem."
+          "text": "Pantelidis, L. (2023). Bearing capacity of centrically-vertically loaded strip foundations based on soil parameters: A classical earth pressure analysis problem. Research Square (Preprint, Version 2). https://doi.org/10.21203/rs.3.rs-2940474/v2"
         },
         {
-          "text": "Pantelidis, L. (2024). Bearing capacity of shallow foundations: A focus on the depth factors in combination with the respective N-factors."
+          "text": "Pantelidis, L. (2024). Bearing capacity of shallow foundations: A focus on the depth factors in combination with the respective N-factors. Arabian Journal of Geosciences, 17(6), 169. https://doi.org/10.1007/s12517-024-11976-7"
+        },
+        {
+          "text": "Pantelidis, L. (2026). Unified pseudo-static seismic reduction factors for shallow foundations via an earth-pressure framework. Soils and Foundations, 66(1), 101713. https://doi.org/10.1016/j.sandf.2025.101713"
+        },
+        {
+          "text": "Pantelidis, L., & Meddah, A. (2024). The effect of loading inclination and eccentricity on the bearing capacity of shallow foundations: A review. Archives of Computational Methods in Engineering, 31, 4189–4208. https://doi.org/10.1007/s11831-024-10113-7"
+        },
+        {
+          "text": "Pantelidis, L., Assefa, E., & Sachpazis, C. I. (2025). The effect of footing shape on the bearing capacity of shallow foundations: A review. Archives of Computational Methods in Engineering, 32, 1597–1617. https://doi.org/10.1007/s11831-024-10184-6"
+        },
+        {
+          "text": "Pantelidis, L., & Meddah, A. (2026). Theoretical investigation of the effect of soil compressibility in the context of the bearing capacity of shallow foundations. Proceedings of the 21st International Conference on Soil Mechanics and Geotechnical Engineering (Vienna, Austria, June 14–19, 2026)."
+        },
+        {
+          "text": "Pantelidis, L., Assefa, E., & Sachpazis, C. (2026). The effect of groundwater table on the bearing capacity of shallow foundations: An earth pressure analysis approach. Proceedings of the 21st International Conference on Soil Mechanics and Geotechnical Engineering (Vienna, Austria, June 14–19, 2026)."
         }
       ]
     },

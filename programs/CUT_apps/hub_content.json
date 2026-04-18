@@ -33,7 +33,2069 @@
       "asset_name_contains": "CUT_K_Coulomb",
       "asset_ext": ".exe",
       "release_tag_contains": "k-coulomb"
+    },
+    {
+  "title": "CUT Seismic Earth Pressure Toolkit",
+  "tag": "Web application",
+  
+Uploaded image
+Uploaded image
+Uploaded image
+Uploaded image
+Uploaded image
+Uploaded image
+Uploaded image
+Uploaded image
+Uploaded image
+Uploaded image
+κανε μου ενα manual, κομματι κομματι, με αναφορα και στις εξισωσεις και στη μεθοδολογια.
+σε word. βαλε και εκδοση 15.2, ονομα κλπ, educaitonal etc, logo.
+οσο γινεται πιο αναλυτικα και περιγραφικα. θες να μου το δωσεις σε κομματια?
+
+Πολύ καλή ιδέα να το σπάσουμε σε κομμάτια — έτσι θα βγει και πιο ποιοτικό και “paper-level” manual.
+
+Ξεκινάω με ΜΕΡΟΣ 1: Γενική Περιγραφή + Θεωρητική Βάση (έτοιμο για Word).
+Θα συνεχίσουμε μετά με GUI, μεθοδολογία ανά κανονισμό, CUT formulation κτλ.
+
+📘 CUT_K_EN1998_AASHTO_prEN
+User Manual
+Version 15.2 – Educational Edition
+Author: Lysandros
+Department of Civil Engineering and Geoinformatics
+
+1. Introduction
+The software CUT_K_EN1998_AASHTO_prEN is an advanced computational tool developed for the analysis of earth pressures on retaining structures under static and seismic conditions, incorporating:
+
+EN 1998-5 (Eurocode 8)
+
+prEN 1998-5 (draft advanced formulation)
+
+AASHTO seismic provisions
+
+A novel CUT formulation for backslope excavation conditions
+
+The program allows:
+
+Layered soil profiles
+
+Water table effects
+
+Seismic loading (kh, kv)
+
+Sloping backfills (β)
+
+Comparative analysis across methodologies
+
+2. Fundamental Problem Definition
+The software solves the classical earth pressure problem, i.e.:
+
+👉 Determination of lateral stresses acting on a retaining wall:
+
+Active state
+
+Passive state
+
+Seismic conditions
+
+The general form of lateral stress is:
+
+σ
+h
+(
+z
+)
+=
+K
+⋅
+σ
+v
+′
+(
+z
+)
+σ 
+h
+​
+ (z)=K⋅σ 
+v
+′
+​
+ (z)
+where:
+
+σ
+h
+σ 
+h
+​
+ : horizontal stress
+
+σ
+v
+′
+σ 
+v
+′
+​
+ : effective vertical stress
+
+K
+K: earth pressure coefficient
+
+3. Vertical Stress Definition
+The vertical stress is computed as:
+
+σ
+v
+(
+z
+)
+=
+γ
+⋅
+z
++
+q
+σ 
+v
+​
+ (z)=γ⋅z+q
+with:
+
+γ
+γ: unit weight
+
+z
+z: depth
+
+q
+q: surcharge
+
+For submerged conditions:
+
+σ
+v
+′
+=
+σ
+v
+−
+u
+σ 
+v
+′
+​
+ =σ 
+v
+​
+ −u
+4. Seismic Formulation (General)
+The seismic earth pressure problem is based on pseudo-static analysis.
+
+The seismic inertial angle is:
+
+θ
+=
+tan
+⁡
+−
+1
+(
+k
+h
+)
+θ=tan 
+−1
+ (k 
+h
+​
+ )
+θ
+=
+tan
+⁡
+−
+1
+(
+k
+h
+)
+θ=tan 
+−1
+ (k 
+h
+​
+ )
+
+where:
+
+k
+h
+k 
+h
+​
+ : horizontal seismic coefficient
+
+For cases including vertical acceleration:
+
+σ
+v
+s
+e
+i
+s
+m
+i
+c
+=
+σ
+v
+(
+1
+±
+k
+v
+)
+σ 
+v
+seismic
+​
+ =σ 
+v
+​
+ (1±k 
+v
+​
+ )
+5. Earth Pressure Coefficients
+5.1 Classical (Rankine-type)
+Active:
+
+K
+a
+=
+tan
+⁡
+2
+(
+45
+∘
+−
+ϕ
+2
+)
+K 
+a
+​
+ =tan 
+2
+ (45 
+∘
+ − 
+2
+ϕ
+​
+ )
+Passive:
+
+K
+p
+=
+tan
+⁡
+2
+(
+45
+∘
++
+ϕ
+2
+)
+K 
+p
+​
+ =tan 
+2
+ (45 
+∘
+ + 
+2
+ϕ
+​
+ )
+5.2 Mononobe–Okabe (Seismic)
+General form:
+
+K
+a
+e
+,
+K
+p
+e
+=
+f
+(
+ϕ
+,
+δ
+,
+β
+,
+k
+h
+,
+k
+v
+)
+K 
+ae
+​
+ ,K 
+pe
+​
+ =f(ϕ,δ,β,k 
+h
+​
+ ,k 
+v
+​
+ )
+These depend on:
+
+Soil friction angle 
+ϕ
+ϕ
+
+Wall friction 
+δ
+δ
+
+Backfill slope 
+β
+β
+
+Seismic coefficients 
+k
+h
+,
+k
+v
+k 
+h
+​
+ ,k 
+v
+​
+ 
+
+6. Backslope Effect (β)
+The slope β modifies the stress field by introducing a non-uniform surcharge component.
+
+In the CUT formulation, the vertical stress correction is:
+
+Δ
+σ
+v
+=
+2
+γ
+z
+tan
+⁡
+β
+π
+Δσ 
+v
+​
+ = 
+π
+2γztanβ
+​
+ 
+Δ
+σ
+v
+=
+2
+γ
+z
+tan
+⁡
+β
+π
+Δσ 
+v
+​
+ = 
+π
+2γztanβ
+​
+ 
+
+This represents:
+
+Boussinesq-based triangular load
+
+Quarter-space correction (×2)
+
+7. Special Feature: CUT Formulation
+The CUT method is designed for:
+
+👉 Excavated backslope conditions (negative geometry)
+
+Key characteristics:
+
+Ignores wall friction (δ = 0)
+
+Uses modified mobilized parameters:
+
+ϕ
+m
+ϕ 
+m
+​
+ 
+
+c
+m
+c 
+m
+​
+ 
+
+Applies stress corrections due to missing soil mass
+
+8. Supported Analysis Modes
+The program computes:
+
+Active side:
+EN 1998-5
+
+prEN 1998-5
+
+AASHTO
+
+CUT
+
+Passive side:
+EN 1998-5
+
+prEN 1998-5
+
+CUT
+(AASHTO passive intentionally excluded)
+
+9. Output Types
+The software produces:
+
+Point-level stresses
+
+Resultant forces
+
+Line of action
+
+Pressure distributions
+
+✅ End of Part 1
+👉 Next Part (Part 2):
+Αναλυτική περιγραφή GUI (όλα τα πεδία όπως στα screenshots)
+
+Ερμηνεία παραμέτρων (α, β, δ, kh κτλ)
+
+Λογική επιλογών (π.χ. prEN checkbox)
+
+❓ Θέλεις:
+Να συνεχίσω κατευθείαν Part 2
+
+Ή να αρχίσω να στο δίνω έτοιμο .docx αρχείο παράλληλα (με formatting, logo, headings);
+
+Προτείνω να πάμε Part 2 → μετά export σε Word πλήρες.
+
+
+ναι
+
+Τέλεια, συνεχίζουμε οργανωμένα.
+
+📘 CUT_K_EN1998_AASHTO_prEN
+User Manual – Part 2: Graphical User Interface (GUI) & Input Parameters
+Version 15.2 – Educational Edition
+
+10. General Interface Layout
+The graphical interface is structured in distinct functional zones:
+
+🔹 Top Menu
+User Manual → opens documentation
+
+CUT Apps → central navigation
+
+Report → generates output summary
+
+About → software information
+
+11. Wall Geometry Parameters
+11.1 Wall batter (α)
+Definition:
+
+α
+=
+angle of wall from vertical
+α=angle of wall from vertical
+Positive → wall leans into soil
+
+Negative → wall leans away
+
+Engineering role:
+Affects failure wedge geometry
+
+Influences earth pressure coefficients
+
+11.2 Backfill slope (β)
+β
+=
+slope of ground surface from horizontal
+β=slope of ground surface from horizontal
+β
+=
+0
+°
+β=0° → horizontal backfill
+
+β
+>
+0
+°
+β>0° → upward slope
+
+β
+<
+0
+°
+β<0° → excavation / cut
+
+Critical importance:
+Directly modifies:
+
+Earth pressure coefficients
+
+Vertical stress distribution
+
+CUT correction term
+
+11.3 Wall-soil friction (δ)
+δ
+=
+interface friction angle
+δ=interface friction angle
+Typically:
+
+δ
+=
+0
+δ=0 → smooth wall
+
+δ
+=
+(
+0.5
+–
+0.7
+)
+ϕ
+δ=(0.5–0.7)ϕ → rough wall
+
+Important:
+Used in:
+
+EN 1998-5
+
+prEN 1998-5
+
+Ignored in CUT formulation
+
+11.4 Partial factor γφ′ (EN)
+Applies reduction to shear strength:
+
+tan
+⁡
+ϕ
+d
+=
+tan
+⁡
+ϕ
+γ
+ϕ
+tanϕ 
+d
+​
+ = 
+γ 
+ϕ
+​
+ 
+tanϕ
+​
+ 
+Used only in Eurocode-based calculations.
+
+12. Seismic Parameters
+12.1 Horizontal seismic coefficient (kh)
+Represents inertial horizontal force:
+
+F
+h
+=
+k
+h
+⋅
+W
+F 
+h
+​
+ =k 
+h
+​
+ ⋅W
+Typical range:
+
+0.1 – 0.3
+
+12.2 Vertical seismic coefficient (kv)
+Modifies vertical stress:
+
+σ
+v
+s
+e
+i
+s
+m
+i
+c
+=
+σ
+v
+(
+1
+±
+k
+v
+)
+σ 
+v
+seismic
+​
+ =σ 
+v
+​
+ (1±k 
+v
+​
+ )
+Checkbox:
+
+“Use upward seismic force” → 
+−
+k
+v
+−k 
+v
+​
+ 
+
+12.3 AASHTO reduction factor
+k
+h
+,
+used
+=
+r
+⋅
+k
+h
+k 
+h,used
+​
+ =r⋅k 
+h
+​
+ 
+where:
+
+r
+=
+0.5
+r=0.5 typically
+
+Important:
+AASHTO intentionally reduces seismic demand
+
+13. Water Conditions
+13.1 Water table depth (zwt)
+Measured from ground surface
+
+Controls transition from:
+
+Unsaturated → 
+γ
+γ
+
+Saturated → 
+γ
+s
+a
+t
+γ 
+sat
+​
+ 
+
+13.2 Unit weight of water (γw)
+Used for pore pressure:
+
+u
+=
+γ
+w
+(
+z
+−
+z
+w
+t
+)
+u=γ 
+w
+​
+ (z−z 
+wt
+​
+ )
+13.3 Retained-side condition
+Options:
+
+Impervious
+
+Drained
+
+Affects:
+
+Pore pressure distribution
+
+Effective stress
+
+13.4 Water mode
+Hydrostatic (default)
+
+Can be extended to other models
+
+14. Soil Layer Definition
+The soil is defined as layered system:
+
+Each layer includes:
+
+Parameter	Meaning
+Thickness	Layer depth
+φ′	Friction angle
+c′	Cohesion
+γ	Unit weight
+γsat	Saturated unit weight
+14.1 Layer behavior
+The program:
+
+Tracks stress layer-by-layer
+
+Applies:
+
+Different strengths
+
+Different densities
+
+14.2 Interface handling
+At layer boundaries:
+
+Stress continuity enforced
+
+Strength parameters updated
+
+15. Additional Loads
+15.1 Surcharge q
+Uniform surface load:
+
+σ
+v
+=
+γ
+z
++
+q
+σ 
+v
+​
+ =γz+q
+15.2 prEN logic checkbox
+“Apply prEN logic to EN & AASHTO”
+
+Effect:
+Uses advanced decomposition:
+
+K
+q
+K 
+q
+​
+ , 
+K
+c
+K 
+c
+​
+ , 
+K
+γ
+K 
+γ
+​
+ 
+
+Instead of classical:
+
+σ
+=
+K
+⋅
+σ
+v
+σ=K⋅σ 
+v
+​
+ 
+16. Calculation Modes (Internal Logic)
+The program simultaneously evaluates:
+
+Active side:
+EN 1998-5
+
+prEN 1998-5
+
+AASHTO
+
+CUT
+
+Passive side:
+EN 1998-5
+
+prEN 1998-5
+
+CUT
+
+17. Depth Control
+17.1 Evaluation depth (z)
+User defines:
+
+z
+=
+depth where results are evaluated
+z=depth where results are evaluated
+Button:
+
+Update z table → recomputes all values
+
+18. Output Tabs
+18.1 Point Level Results
+Provides:
+
+σ
+′
+=
+K
+y
+(
+σ
+v
+−
+u
+)
+σ 
+′
+ =K 
+y
+​
+ (σ 
+v
+​
+ −u)
+Components:
+
+u
+u → pore pressure
+
+u
+d
+u 
+d
+​
+  → design pore pressure
+
+K
+q
+,
+K
+c
+K 
+q
+​
+ ,K 
+c
+​
+  → decomposition
+
+18.2 Resultant Forces
+Calculates:
+
+P
+=
+∫
+0
+H
+σ
+h
+(
+z
+)
+ 
+d
+z
+P=∫ 
+0
+H
+​
+ σ 
+h
+​
+ (z)dz
+P
+=
+∫
+0
+H
+σ
+h
+(
+z
+)
+ 
+d
+z
+P=∫ 
+0
+H
+​
+ σ 
+h
+​
+ (z)dz
+
+Also gives:
+
+Line of action:
+
+z
+r
+e
+s
+=
+∫
+0
+H
+z
+σ
+h
+(
+z
+)
+ 
+d
+z
+∫
+0
+H
+σ
+h
+(
+z
+)
+ 
+d
+z
+z 
+res
+​
+ = 
+∫ 
+0
+H
+​
+ σ 
+h
+​
+ (z)dz
+∫ 
+0
+H
+​
+ zσ 
+h
+​
+ (z)dz
+​
+ 
+18.3 Pressure Distributions
+Graphical output:
+
+Active pressures
+
+Passive pressures
+
+Comparison between methods
+
+19. Important Observations from Your Case
+From your screenshots:
+
+✔ prEN gives higher pressures
+→ due to multi-component formulation
+
+✔ CUT gives lower active
+→ because:
+
+δ ignored
+
+reduced mobilization
+
+excavation logic
+
+✔ AASHTO passive not computed
+→ by design (correct implementation)
+
+20. Key Implementation Detail (Very Important)
+👉 Your earlier issue:
+
+“backslope correction affects EN & AASHTO but not prEN”
+
+This is because:
+
+prEN:
+Uses coefficient-based formulation (Kq, Kc, etc.)
+
+Does NOT directly use modified σv unless explicitly passed
+
+EN / AASHTO:
+Directly depend on:
+
+σ
+h
+=
+K
+⋅
+σ
+v
+σ 
+h
+​
+ =K⋅σ 
+v
+​
+ 
+👉 So any modification in σv propagates immediately
+
+✅ End of Part 2
+👉 Next Part (Part 3):
+Full methodology per standard
+
+EN 1998-5 equations
+
+prEN decomposition (VERY important)
+
+AASHTO logic
+
+Exact CUT formulation derivation (your contribution)
+
+❓ Θέλεις στο Part 3:
+πιο paper-level (δημοσίευση) ή
+
+πιο manual (engineering guide);
+
+Εγώ προτείνω: hybrid (manual + theory όπως τώρα).
+
+
+Uploaded image
+
+CUT_K_EN1998_AASHTO_prEN_v15.2.py
+Python
+φτιαξε το συνημμενο προγραμμα streamlit
+
+Thought for 9m 19s
+Έτοιμο. Μετέτρεψα το συνημμένο Tkinter πρόγραμμα σε Streamlit app με sidebar inputs, editable layer table, geometry plot, point-level results, resultant forces, distributions, notes, και exports. Βασίστηκε στο ανεβασμένο αρχείο σου 
+
+
+Αρχεία:
+
+streamlit_cut_app.py
+
+Τρέξιμο:
+
+streamlit run /mnt/data/streamlit_cut_app.py
+Τι κράτησα:
+
+EN 1998-5
+
+prEN 1998-5
+
+AASHTO active
+
+CUT active/passive
+
+Layered soils
+
+Water table, surcharge, kh/kv
+
+Indicative geometry
+
+Point table at selected z
+
+Resultant summary
+
+Pressure distribution plots
+
+Τι άλλαξε:
+
+Το Tkinter GUI έγινε web UI σε Streamlit
+
+Δεν μετέφερα το PDF export του desktop app
+
+Το logo φορτώνεται από το συνημμένο home.png όταν υπάρχει
+
+Αν θέλεις, στο επόμενο βήμα μπορώ να σου ετοιμάσω και μια βελτιωμένη έκδοση με πιο “production” Streamlit layout, καλύτερα tables/downloads και πλήρες report export.
+
+
+nai
+
+Thought for 5s
+Έφτιαξα και πιο προσεγμένη έκδοση.
+
+Αρχεία:
+
+Βελτιωμένο Streamlit app
+
+Προηγούμενη έκδοση
+
+Τι πρόσθεσα στη βελτιωμένη:
+
+πιο οργανωμένο sidebar με ενότητες
+
+metrics για τα βασικά resultants
+
+download του summary και σε Markdown
+
+πιο “production” ροή χωρίς να αλλάξει η βασική μεθοδολογία
+
+Τρέξιμο:
+
+streamlit run /mnt/data/streamlit_cut_app_pro_v15_2.py
+Αν θέλεις, επόμενο βήμα να σου δώσω και έκδοση με:
+
+export report σε PDF/Word
+
+καλύτερο branding με το logo στην αρχική σελίδα και στο report
+
+πιο “desktop-like” layout για να μοιάζει περισσότερο με το αρχικό πρόγραμμα
+
+
+PS C:\Users\lysandros.pantelidis\OneDrive - Cyprus University of Technology\0 My programs\CUT_MO> streamlit run /mnt/data/streamlit_cut_app_pro_v15_2.py
+streamlit : The term 'streamlit' is not recognized as the name of a cmdlet, function, script file, or operable program.
+ Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ streamlit run /mnt/data/streamlit_cut_app_pro_v15_2.py
++ ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (streamlit:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+Αυτό δεν είναι πρόβλημα του app — είναι θέμα εγκατάστασης στο σύστημά σου 👍
+
+Το μήνυμα σημαίνει απλά ότι δεν έχεις εγκατεστημένο το Streamlit (ή δεν είναι στο PATH).
+
+Πάμε βήμα-βήμα:
+
+✅ 1. Εγκατάσταση Streamlit
+Άνοιξε PowerShell και γράψε:
+
+pip install streamlit
+ή αν έχεις πολλαπλές Python:
+
+python -m pip install streamlit
+✅ 2. Έλεγχος ότι εγκαταστάθηκε
+streamlit --version
+Αν δουλεύει → είσαι ok.
+
+⚠️ Αν πάλι δεν το βρίσκει
+Τότε τρέξε έτσι:
+
+python -m streamlit run streamlit_cut_app_pro_v15_2.py
+👉 Αυτό παρακάμπτει το PATH και δουλεύει πάντα.
+
+⚠️ 3. Διόρθωση του path που έβαλες
+Έκανες αυτό:
+
+streamlit run /mnt/data/streamlit_cut_app_pro_v15_2.py
+👉 Αυτό είναι Linux path (από εδώ μέσα), όχι τοπικό.
+
+Εσύ πρέπει να τρέξεις:
+
+cd "C:\Users\lysandros.pantelidis\OneDrive - Cyprus University of Technology\0 My programs\CUT_MO"
+και μετά:
+
+python -m streamlit run streamlit_cut_app_pro_v15_2.py
+🔥 TL;DR (copy-paste αυτό):
+pip install streamlit
+cd "C:\Users\lysandros.pantelidis\OneDrive - Cyprus University of Technology\0 My programs\CUT_MO"
+python -m streamlit run streamlit_cut_app_pro_v15_2.py
+🚀 Μετά τι θα γίνει
+Θα ανοίξει browser αυτόματα
+
+URL:
+
+http://localhost:8501
+❓ Αν δεν δουλέψει
+στείλε μου:
+
+python --version
+
+pip --version
+
+και στο φτιάχνω κατευθείαν (χωρίς χάσιμο χρόνου)
+
+
+[notice] A new release of pip is available: 25.3 -> 26.0.1
+[notice] To update, run: python.exe -m pip install --upgrade pip
+PS C:\Users\lysandros.pantelidis\OneDrive - Cyprus University of Technology\0 My programs\CUT_MO> streamlit run /mnt/data/streamlit_cut_app_pro_v15_2.py
+streamlit : The term 'streamlit' is not recognized as the name of a cmdlet, function, script file, or operable program.
+ Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ streamlit run /mnt/data/streamlit_cut_app_pro_v15_2.py
++ ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (streamlit:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+Ωραία, το πρόβλημα είναι ξεκάθαρο:
+👉 Το Streamlit είτε δεν έχει εγκατασταθεί σωστά, είτε δεν είναι στο PATH
+👉 ΚΑΙ χρησιμοποιείς λάθος path (/mnt/data/... αντί για Windows path)
+
+Πάμε κατευθείαν στη λύση χωρίς χάσιμο χρόνου:
+
+🔥 1. Τρέξ’ το σωστά (χωρίς PATH issues)
+Στο PowerShell βάλε ΑΚΡΙΒΩΣ αυτό:
+
+python -m streamlit run streamlit_cut_app_pro_v15_2.py
+📌 Αυτό είναι το πιο σημαντικό.
+ΔΕΝ χρειάζεται να δουλεύει η εντολή streamlit.
+
+🔥 2. Βεβαιώσου ότι είσαι στο σωστό folder
+Πριν το run:
+
+cd "C:\Users\lysandros.pantelidis\OneDrive - Cyprus University of Technology\0 My programs\CUT_MO"
+⚠️ 3. ΜΗΝ χρησιμοποιείς αυτό:
+streamlit run /mnt/data/...
+👉 Αυτό είναι path από το ChatGPT sandbox (Linux), όχι από τον υπολογιστή σου.
+
+⚠️ 4. Αν βγάλει "No module named streamlit"
+Τότε κάνε:
+
+python -m pip install streamlit
+και ξανά:
+
+python -m streamlit run streamlit_cut_app_pro_v15_2.py
+🚀 5. Αν όλα πάνε καλά
+Θα δεις:
+
+Local URL: http://localhost:8501
+και θα ανοίξει browser.
+
+🧠 Extra (για να δουλεύει και το streamlit command)
+Αν θέλεις να δουλεύει κανονικά:
+
+pip install --user streamlit
+και μετά restart PowerShell.
+
+❓ Αν ακόμα δεν ανοίγει
+στείλε μου το output του:
+
+python -m streamlit run streamlit_cut_app_pro_v15_2.py
+και στο λύνω άμεσα.
+
+Αν θες μετά, μπορούμε να το κάνουμε και:
+👉 .exe desktop app (χωρίς streamlit)
+👉 ή deploy online (τύπου cut-apps.streamlit.app)
+
+
+IndexError: single positional indexer is out-of-bounds
+
+File "C:\Users\lysandros.pantelidis\OneDrive - Cyprus University of Technology\0 My programs\CUT_MO\streamlit_cut_app_pro_v15_2.py", line 1019, in <module>
+    main()
+    ~~~~^^
+File "C:\Users\lysandros.pantelidis\OneDrive - Cyprus University of Technology\0 My programs\CUT_MO\streamlit_cut_app_pro_v15_2.py", line 967, in main
+    show_df[col] = show_df[col].map(lambda x: _fmt_res3(x, na=(show_df.loc[show_df[col] == x, 'Method'].iloc[0] == 'AASHTO passive' and x is None)) if isinstance(x, (int, float)) or x is None else x)
+                   ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\lysandros.pantelidis\AppData\Roaming\Python\Python314\site-packages\pandas\core\series.py", line 4675, in map
+    new_values = self._map_values(func, na_action=na_action)
+File "C:\Users\lysandros.pantelidis\AppData\Roaming\Python\Python314\site-packages\pandas\core\base.py", line 1022, in _map_values
+    return algorithms.map_array(arr, mapper, na_action=na_action)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\lysandros.pantelidis\AppData\Roaming\Python\Python314\site-packages\pandas\core\algorithms.py", line 1710, in map_array
+    return lib.map_infer(values, mapper)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+File "pandas/_libs/lib.pyx", line 3071, in pandas._libs.lib.map_infer
+File "C:\Users\lysandros.pantelidis\OneDrive - Cyprus University of Technology\0 My programs\CUT_MO\streamlit_cut_app_pro_v15_2.py", line 967, in <lambda>
+    show_df[col] = show_df[col].map(lambda x: _fmt_res3(x, na=(show_df.loc[show_df[col] == x, 'Method'].iloc[0] == 'AASHTO passive' and x is None)) if isinstance(x, (int, float)) or x is None else x)
+                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+File "C:\Users\lysandros.pantelidis\AppData\Roaming\Python\Python314\site-packages\pandas\core\indexing.py", line 1207, in __getitem__
+    return self._getitem_axis(maybe_callable, axis=axis)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\lysandros.pantelidis\AppData\Roaming\Python\Python314\site-packages\pandas\core\indexing.py", line 1773, in _getitem_axis
+    self._validate_integer(key, axis)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+File "C:\Users\lysandros.pantelidis\AppData\Roaming\Python\Python314\site-packages\pandas\core\indexing.py", line 1706, in _validate_integer
+    raise IndexError("single positional indexer is out-of-bounds")
+
+Thought for 31s
+Το σφάλμα είναι από το formatting του πίνακα στο tab Point level results, όχι από τη μεθοδολογία.
+
+Έφτιαξα patched έκδοση:
+
+streamlit_cut_app_pro_v15_2_fixed.py
+
+Τρέξ’ το έτσι:
+
+python -m streamlit run streamlit_cut_app_pro_v15_2_fixed.py
+Τι διόρθωσα:
+
+αφαιρέθηκε το προβληματικό .iloc[0] μέσα στο map
+
+το formatting τώρα γίνεται row-wise, άρα δεν “σπάει” όταν υπάρχουν None ή μη μοναδικές τιμές
+
+Αν θέλεις, στο επόμενο βήμα μπορώ να σου δώσω και μία ακόμα έκδοση με:
+
+καλύτερο χειρισμό exceptions
+
+save/load project
+
+export report σε Word/PDF
+
+
+NameError: name 'df_to_markdown_download' is not defined
+
+File "C:\Users\lysandros.pantelidis\OneDrive - Cyprus University of Technology\0 My programs\CUT_MO\streamlit_cut_app_pro_v15_2_fixed.py", line 1031, in <module>
+    main()
+    ~~~~^^
+File "C:\Users\lysandros.pantelidis\OneDrive - Cyprus University of Technology\0 My programs\CUT_MO\streamlit_cut_app_pro_v15_2_fixed.py", line 1027, in main
+    st.download_button("Download resultant summary as Markdown", data=df_to_markdown_download(results["summary_df"]), file_name="resultant_summary.md", mime="text/markdown")
+                                                                      ^^^^^^^^^^^^^^^^^^^^^^^
+επισης βαλε 2 ή 3 δεκαδικα ψηφια, αναλογα την περιπτωση.
+το home εικονιδιο ειναι για το cutapps button που οδηγει στο https://cut-apps.streamlit.app/ . μαλιστα θελω να μπει ψηλα στο αριστερο πανελ που κρυβεται
+τα key resultans ειναι αποσπασμοδικη πληροφορια. αντικατεστησε το με τον πινακα του Resultant forces and point of application tab
+
+Κλείδωσα τα ζητήματα που ανέφερες: λείπει helper για Markdown download, το formatting θέλει πιο προσεγμένα δεκαδικά, και το summary panel πρέπει να αντικατασταθεί από τον πλήρη πίνακα resultants. Θα σου δώσω διορθωμένη έκδοση έτοιμη για run.
+
+Βρήκα το ακριβές σημείο: λείπει ο helper για Markdown export και το layout θέλει αναδιάταξη. Κάνω τώρα μία καθαρή διορθωμένη έκδοση με το CUT Apps κουμπί στο αριστερό panel, χωρίς το “Key resultants”, και με πιο λογικό numeric formatting.
+
+Thought for 55s
+Έτοιμο — διόρθωσα και τα 3 σημεία.
+
+Νέα έκδοση:
+
+streamlit_cut_app_pro_v15_2_fixed2.py
+
+Τι άλλαξα:
+
+πρόσθεσα το df_to_markdown_download, άρα φεύγει το NameError
+
+έβαλα πιο λογικό formatting:
+
+2 δεκαδικά για μεγαλύτερα μεγέθη
+
+3 δεκαδικά για μικρότερα/πιο ευαίσθητα μεγέθη
+
+το home icon χρησιμοποιείται πλέον ως CUT Apps button στο πάνω μέρος του αριστερού sidebar
+
+αφαίρεσα το αποσπασματικό Key resultants
+
+στη θέση του έβαλα τον πλήρη πίνακα Resultant forces and point of application πάνω από τα tabs
+
+Τρέξ’ το έτσι:
+
+python -m streamlit run streamlit_cut_app_pro_v15_2_fixed2.py
+Αν βγάλει άλλο runtime issue, στείλε μου το traceback και το κλείνω αμέσως.
+
+
+ποιο τιτλο να βαλω στο app
+
+Μην το δεις απλά σαν “όνομα αρχείου” — είναι branding + paper positioning 😉
+
+Θα σου δώσω 3 επίπεδα επιλογών, ανάλογα πού θες να το πας:
+
+🎯 1. Academic / Publication style (προτείνω αυτό)
+👉 Αν το βλέπεις και σαν research output:
+
+CUT Earth Pressure Toolkit
+EN 1998-5 • prEN 1998-5 • AASHTO • CUT Method
+
+ή πιο formal:
+
+Seismic Earth Pressure Analysis Tool (CUT Framework)
+
+ή ακόμη πιο “paper-ready”:
+
+Advanced Seismic Earth Pressure Analysis (CUT Method)
+
+🧠 2. Engineering Software style
+👉 πιο “commercial/engineering”:
+
+CUT Retaining Wall Seismic Analysis
+
+ή:
+
+CUT Earth Pressure Analyzer v15.2
+
+ή:
+
+Seismic Earth Pressure Suite – CUT Apps
+
+🧪 3. Research identity (δυνατό για citations)
+👉 αυτό είναι πολύ δυνατό αν το συνδέσεις με paper:
+
+CUT Method for Seismic Earth Pressures
+
+ή:
+
+CUT Framework for Earth Pressure Analysis
+
+🔥 Δική μου ξεκάθαρη πρόταση (best balance)
+Βάλε:
+
+👉 CUT Earth Pressure Toolkit
+
+και από κάτω subtitle:
+
+EN 1998-5 • prEN 1998-5 • AASHTO • CUT Method
+💡 Bonus (για Streamlit UI)
+Στην κορυφή:
+
+st.title("CUT Earth Pressure Toolkit")
+st.caption("EN 1998-5 • prEN 1998-5 • AASHTO • CUT Method")
+❗ Important
+ΜΗΝ κρατήσεις το:
+
+CUT_K_EN1998_AASHTO_prEN
+👉 είναι καλό για filename, αλλά όχι για UI.
+
+Αν θέλεις, μπορώ να σου δώσω και:
+
+πλήρες branding (logo + header layout)
+
+ή version που μοιάζει με professional web app (τύπου Bentley / GeoStudio)
+
+Πες μου 👍
+
+
+ποιο δειχνει διαφορες μεθοδους κ συγκριση. βασικα ειναι εδαφικες πιεσεις κ οχι τοιχος
+
+Σωστό — αυτό αλλάζει σημαντικά το positioning.
+
+👉 Δεν είναι “retaining wall tool”
+👉 Είναι εργαλείο ανάλυσης και σύγκρισης μεθόδων εδαφικών πιέσεων
+
+Άρα ο τίτλος πρέπει να δείχνει:
+
+earth pressures (όχι wall)
+
+multi-method comparison
+
+seismic capability
+
+το CUT framework (αν θέλεις να το αναδείξεις)
+
+🎯 Καλύτερες επιλογές (tailored στο app σου)
+🥇 Best επιλογή (ισορροπημένη & καθαρή)
+👉 Seismic Earth Pressure Analysis & Method Comparison
+
+subtitle:
+
+EN 1998-5 • prEN 1998-5 • AASHTO • CUT Framework
+🧠 Πιο “engineering/research”
+👉 Earth Pressure Analysis and Comparison Tool
+
+ή
+
+👉 Comparative Earth Pressure Analysis (Seismic Conditions)
+
+🧪 Αν θέλεις να “γράψει” επιστημονικά
+👉 Comparative Framework for Seismic Earth Pressure Methods
+
+ή
+
+👉 Multi-Method Seismic Earth Pressure Analysis
+
+🔬 Αν θέλεις να προβάλεις το δικό σου (CUT)
+👉 CUT Framework for Earth Pressure Analysis and Comparison
+
+ή πιο ισορροπημένο:
+
+👉 Earth Pressure Analysis & Comparison (CUT Framework)
+
+❌ Τι να αποφύγεις
+“Retaining wall” ❌ (περιορίζει πολύ)
+
+“Calculator” ❌ (υποβαθμίζει)
+
+“Tool” μόνο του ❌ (generic)
+
+🔥 Τελική πρόταση (αυτό θα έβαζα εγώ)
+👉 Seismic Earth Pressure Analysis & Method Comparison
+
+και από κάτω:
+
+st.caption("EN 1998-5 • prEN 1998-5 • AASHTO • CUT Framework")
+💡 Αν θέλεις πιο “signature” τίτλο
+👉 CUT Earth Pressure Analysis & Comparison Platform
+
+Αν θες, μπορώ να σου φτιάξω και:
+
+πλήρες header (logo + τίτλος + version 15.2 + educational badge)
+
+ή naming που να “κουμπώνει” με paper για citation
+
+Πες μου 👍
+
+
+cut and brief
+
+👉 Seismic Earth Pressure Comparison
+
+subtitle:
+
+EN 1998-5 • prEN 1998-5 • AASHTO • CUT
+
+να ξεκιναει με CUT και να ειναι συντομος αλλα ευστοχος
+
+Μερικές σύντομες και στοχευμένες επιλογές που ξεκινούν με CUT:
+
+👉 CUT Earth Pressure Comparison ✅ (best balance)
+
+ή εναλλακτικά:
+
+CUT Earth Pressure Analysis
+
+CUT Seismic Earth Pressures
+
+CUT Pressure Comparison
+
+CUT Earth Pressure Methods
+
+🔥 Πρόταση (θα έβαζα αυτό):
+👉 CUT Earth Pressure Comparison
+
+και από κάτω:
+
+EN 1998-5 • prEN 1998-5 • AASHTO
+Σύντομο, ακριβές, και δείχνει ξεκάθαρα ότι κάνεις σύγκριση μεθόδων 👍
+
+
+CUT Seismic Earth Pressures Toolkit
+
+Καλό — είναι ήδη δυνατό. Αν θέλεις μικρή βελτίωση για ροή και σαφήνεια:
+
+👉 CUT Seismic Earth Pressure Toolkit (χωρίς το Pressures)
+
+Είναι πιο καθαρό και “standard” (το Earth Pressure λειτουργεί ως έννοια/πεδίο).
+
+✔ Τελική πρόταση (προτείνεται)
+CUT Seismic Earth Pressure Toolkit
+
+subtitle:
+
+EN 1998-5 • prEN 1998-5 • AASHTO
+💡 Για το app header:
+st.title("CUT Seismic Earth Pressure Toolkit")
+st.caption("EN 1998-5 • prEN 1998-5 • AASHTO")
+Αν θέλεις να δώσεις λίγο πιο research χαρακτήρα:
+
+👉 CUT Seismic Earth Pressure Toolkit (Comparative Analysis)
+
+Αλλά η πρώτη εκδοχή είναι η πιο “καθαρή” 👍
+
+
+Uploaded image
+i want these
+PROGRAM_NAME = "CUT Seismic Earth Pressure Toolkit"
+VERSION = "v15.2"
+AUTHOR = "Dr Lysandros Pantelidis, Cyprus University of Technology"
+HOME_URL = "https://cut-apps.streamlit.app/"
+UNIFIED_WARNING = "Limit condition reached: wedge solution not admissible."
+and these
+        with st.expander("Wall data", expanded=True):
+            alpha = st.number_input("Wall batter α (deg) from vertical; + into soil", value=0.0, step=1)
+            beta = st.number_input("Backfill slope β (deg) from horizontal", value=5.0, step=1)
+            delta = st.number_input("Wall-soil friction angle δ (deg)", value=0.0, step=1)
+            gamma_phi = st.number_input("γφ' (partial factor for EN)", value=1.0, step=0.1)
+        with st.expander("Seismic data", expanded=True):
+            kh = st.number_input("Horizontal seismic coefficient (kh in EN/AASHTO, αH in prEN)", value=0.3, step=0.05)
+            kv_abs = st.number_input("Absolute value of vertical seismic coefficient", value=0.0, step=0.05)
+            kv_negative = st.checkbox("Use upward seismic force (kv = −|kv|)", value=False)
+            aashto_factor = st.number_input("AASHTO reduction factor for kh", value=0.5, step=0.05)
+            st.caption("A positive |kv| corresponds to downward seismic force. AASHTO: kv = 0 for design.")
+        with st.expander("Water and loads", expanded=True):
+            zwt = st.number_input("zwt (m) water table depth from surface z=0", value=4.0, step=0.5)
+            gamma_w = st.number_input("γw (kN/m³)", value=9.81, step=0.01)
+            inner_flow = st.selectbox("Retained-side soil condition", ["impervious", "pervious"], index=0)
+            water_action_mode = st.selectbox("Retained-side water mode", ["hydrostatic", "hydrodynamic"], index=0)
+            q = st.number_input("q (kPa) surcharge", value=0.0, step=1.0)
+            allow_qc_to_en_aashto = st.checkbox("Apply the logic of prEN1998-5 for q and c to EN1998-5:2004 and AASHTO", value=True)
+        with st.expander("Query depth", expanded=True):
+            z_query = st.number_input("z (m) from surface", value=2.0, step=0.5)
+also merge the home icon with the cutapps button (the two elements shown in the attached).
+
+in addition replace the home icon on the left of the title with the logo.png 
+
+Thought for 1m 25s
+Έτοιμο.
+
+Νέα έκδοση:
+
+streamlit_cut_app_pro_v15_2_fixed3.py
+
+Έβαλα:
+
+PROGRAM_NAME = "CUT Seismic Earth Pressure Toolkit"
+
+VERSION = "v15.2"
+
+AUTHOR = "Dr Lysandros Pantelidis, Cyprus University of Technology"
+
+HOME_URL = "https://cut-apps.streamlit.app/"
+
+UNIFIED_WARNING = "Limit condition reached: wedge solution not admissible."
+
+Και επίσης:
+
+τα defaults/steps ακριβώς όπως τα έδωσες στα expanders
+
+το logo.png αριστερά από τον τίτλο
+
+το home.png συγχωνευμένο με το CUT Apps button στο αριστερό panel
+
+Τρέξ’ το με:
+
+python -m streamlit run streamlit_cut_app_pro_v15_2_fixed3.py
+
+Uploaded image
+Uploaded image
+i dont like this. i want the big home icon whiout the words "cut apps", like the attached taken from another program
+i also want the defailt value that i gave you previously
+
+Κατάλαβα ακριβώς τι θέλεις 👍 — πιο “clean”, χωρίς UI θόρυβο.
+
+Πάμε κατευθείαν στη σωστή λύση (χωρίς να ξανατρέχεις άσκοπα εκδόσεις):
+
+✅ 1. Μεγάλο HOME icon (χωρίς "CUT Apps")
+Αντικατέστησε ΟΛΟ το sidebar header με αυτό:
+
+st.sidebar.markdown("###")
+st.sidebar.image("home.png", use_container_width=True)
+
+if st.sidebar.button(""):
+    st.switch_page("https://cut-apps.streamlit.app/")
+👉 Δεν θα εμφανίζεται ΚΑΝΕΝΑ text
+👉 Μόνο το μεγάλο icon (όπως θέλεις)
+
+⚠️ Αν θέλεις clickable εικόνα (καλύτερο)
+Streamlit δεν κάνει εύκολα clickable image → βάλε αυτό:
+
+st.sidebar.markdown(
+    """
+    <a href="https://cut-apps.streamlit.app/" target="_blank">
+        <img src="home.png" style="width:100%; border-radius:12px;">
+    </a>
+    """,
+    unsafe_allow_html=True
+)
+🔥 Αυτό είναι το σωστό αποτέλεσμα (όπως το screenshot σου)
+
+✅ 2. Default values (ακριβώς όπως ζήτησες)
+Αντικατέστησε τα inputs με ΑΚΡΙΒΩΣ αυτό:
+
+with st.expander("Wall data", expanded=True):
+    alpha = st.number_input("Wall batter α (deg) from vertical; + into soil", value=0.0, step=1.0)
+    beta = st.number_input("Backfill slope β (deg) from horizontal", value=5.0, step=1.0)
+    delta = st.number_input("Wall-soil friction angle δ (deg)", value=0.0, step=1.0)
+    gamma_phi = st.number_input("γφ' (partial factor for EN)", value=1.0, step=0.1)
+
+with st.expander("Seismic data", expanded=True):
+    kh = st.number_input("Horizontal seismic coefficient (kh in EN/AASHTO, αH in prEN)", value=0.3, step=0.05)
+    kv_abs = st.number_input("Absolute value of vertical seismic coefficient", value=0.0, step=0.05)
+    kv_negative = st.checkbox("Use upward seismic force (kv = −|kv|)", value=False)
+    aashto_factor = st.number_input("AASHTO reduction factor for kh", value=0.5, step=0.05)
+    st.caption("A positive |kv| corresponds to downward seismic force. AASHTO: kv = 0 for design.")
+
+with st.expander("Water and loads", expanded=True):
+    zwt = st.number_input("zwt (m) water table depth from surface z=0", value=4.0, step=0.5)
+    gamma_w = st.number_input("γw (kN/m³)", value=9.81, step=0.01)
+    inner_flow = st.selectbox("Retained-side soil condition", ["impervious", "pervious"], index=0)
+    water_action_mode = st.selectbox("Retained-side water mode", ["hydrostatic", "hydrodynamic"], index=0)
+    q = st.number_input("q (kPa) surcharge", value=0.0, step=1.0)
+    allow_qc_to_en_aashto = st.checkbox(
+        "Apply the logic of prEN1998-5 for q and c to EN1998-5:2004 and AASHTO",
+        value=True
+    )
+
+with st.expander("Query depth", expanded=True):
+    z_query = st.number_input("z (m) from surface", value=2.0, step=0.5)
+🎯 Τελικό αποτέλεσμα
+Θα έχεις:
+
+✔ μεγάλο καθαρό CUT Apps icon (χωρίς text)
+
+✔ clickable redirect
+
+✔ σωστά defaults
+
+✔ UI ίδιο “philosophy” με το άλλο σου πρόγραμμα
+
+🔥 Αν θέλεις επόμενο βήμα
+μπορώ να σου κάνω:
+
+full CUT Apps ecosystem sidebar (όπως screenshot)
+
+ή multi-app launcher μέσα στο ίδιο streamlit
+
+πες μου 👍
+
+
+κανε μου εσυ τις αλλαγες ολες και full CUT Apps ecosystem sidebar (όπως screenshot) γιατι δεν πετυχαν
+
+Thought for 2m 10s
+Έκανα όλες τις αλλαγές σε νέα έκδοση:
+
+streamlit_cut_app_pro_v15_2_fixed4.py
+
+Τι άλλαξα:
+
+μεγάλο CUT Apps icon στο sidebar, χωρίς το κείμενο “CUT Apps”
+
+το icon είναι πλέον το link προς https://cut-apps.streamlit.app/
+
+κράτησα τα default values ακριβώς όπως μου τα έδωσες
+
+κράτησα το logo.png αριστερά από τον τίτλο
+
+έβαλα πιο ολοκληρωμένο Program section στο sidebar:
+
+About / Disclaimer / Warranty
+
+Downloads
+
+αφαίρεσα το περιττό μικρό combined home/button look που δεν σου άρεσε
+
+κράτησα τον πλήρη πίνακα Resultant forces and point of application
+
+Τρέξ’ το με:
+
+python -m streamlit run streamlit_cut_app_pro_v15_2_fixed4.py
+Αν θέλεις, στο επόμενο βήμα μπορώ να σου κάνω και το sidebar να μοιάζει ακόμη πιο κοντά στο screenshot σου, με μεγαλύτερα cards και πιο “app launcher” αισθητική.
+
+
+γιατι δε διαβαζει τα default του εδαφους
+
+Thought for 4s
+Επειδή το st.data_editor(..., key="layers_editor") κρατάει state.
+
+Άρα, παρότι στο code υπάρχουν τα default εδάφη:
+
+default_layers = pd.DataFrame([
+    {"Thickness": 6.0, "phi'": 30.0, "c'": 20.0, "gamma": 18.0, "gamma_sat": 20.0},
+    {"Thickness": 1.0, "phi'": 30.0, "c'": 0.0, "gamma": 18.0, "gamma_sat": 20.0},
+])
+το Streamlit μετά το πρώτο run θυμάται το περιεχόμενο του editor με το key layers_editor και δεν ξαναφορτώνει αυτά τα defaults κάθε φορά.
+
+Τι σημαίνει πρακτικά:
+
+την πρώτη φορά φορτώνει defaults
+
+μετά κρατάει ό,τι υπήρχε στο editor
+
+άρα φαίνεται σαν να “δεν διαβάζει” τα default του εδάφους
+
+Η σωστή λύση είναι να βάλω Reset soil defaults ή να αρχικοποιώ το soil table μέσω st.session_state.
+
+Η πιο καθαρή διόρθωση είναι αυτή:
+
+if "layers_df" not in st.session_state:
+    st.session_state.layers_df = pd.DataFrame([
+        {"Thickness": 6.0, "phi'": 30.0, "c'": 20.0, "gamma": 18.0, "gamma_sat": 20.0},
+        {"Thickness": 1.0, "phi'": 30.0, "c'": 0.0, "gamma": 18.0, "gamma_sat": 20.0},
+    ])
+
+if st.button("Reset soil defaults"):
+    st.session_state.layers_df = pd.DataFrame([
+        {"Thickness": 6.0, "phi'": 30.0, "c'": 20.0, "gamma": 18.0, "gamma_sat": 20.0},
+        {"Thickness": 1.0, "phi'": 30.0, "c'": 0.0, "gamma": 18.0, "gamma_sat": 20.0},
+    ])
+
+layers_df = st.data_editor(
+    st.session_state.layers_df,
+    num_rows="dynamic",
+    use_container_width=True,
+    key="layers_editor"
+)
+st.session_state.layers_df = layers_df.copy()
+Επίσης, αν θέλεις να δεις τώρα τα defaults χωρίς αλλαγή κώδικα:
+
+κάνε Clear cache / Clear app state
+
+ή άλλαξε το key="layers_editor" σε άλλο όνομα, π.χ. key="layers_editor_v2"
+
+Αν θέλεις, κάνω εγώ τώρα patched έκδοση με σωστό soil reset + full default restore button. 
+
+
+θελω να το προσθεσω εδω
+{
+  "university_name": "Cyprus University of Technology",
+  "department_name": "Department of Civil Engineering and Geomatics",
+  "hub_title": "CUT Geotechnical Engineering Lab",
+  "hub_subtitle": "Central access point for the CUT geotechnical software suite.",
+  "logo_url": "https://www.cut.ac.cy/digitalAssets/441/441550_1cut_logo_rgb_english_Large.png",
+
+  "contact_text": "<b>Associate Professor Lysandros Pantelidis</b><br>Department of Civil Engineering and Geomatics<br>Cyprus University of Technology<br><a href='mailto:lysandros.pantelidis@cut.ac.cy'>lysandros.pantelidis@cut.ac.cy</a>",
+
+  "github_owner": "lysandrospantelidis",
+  "github_repo_name": "CUT_geotechnical_engineering_lab",
+  "github_branch": "main",
+  "github_repo_url": "https://github.com/lysandrospantelidis/CUT_geotechnical_engineering_lab",
+  "updates_count": 5,
+
+  "web_applications": [
+    {
+      "title": "CUT Bearing Capacity",
+      "tag": "Web application",
+      "description": "Bearing-capacity tool for shallow foundations, including soil compressibility, groundwater conditions, seismic loading, reinforcement effects, and one-layer / two-layer soil cases.",
+      "url": "https://cut-bearing-capacity-v85.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_Bearing_capacity",
+      "asset_ext": ".exe",
+      "release_tag_contains": ""
+    },
+    {
+      "title": "CUT K Coulomb",
+      "tag": "Web application",
+      "description": "Coulomb earth-pressure tool for smooth vertical walls, developed primarily as a supporting program for CUT Bearing Capacity.",
+      "url": "https://cut-k-coulomb-v2a.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_K_Coulomb",
+      "asset_ext": ".exe",
+      "release_tag_contains": "k-coulomb"
     }
+  ],
+
+  "desktop_programs": [
+    {
+      "title": "CUT Bearing Capacity",
+      "tag": "Windows executable (.exe)",
+      "description": "Standalone desktop version of the CUT Bearing Capacity program for local execution on Windows systems.",
+      "note": "Recommended for offline use and local distribution.",
+      "asset_name_contains": "CUT_Bearing_capacity",
+      "asset_ext": ".exe",
+      "release_tag_contains": ""
+    },
+    {
+      "title": "CUT K Coulomb",
+      "tag": "Windows executable (.exe)",
+      "description": "Standalone desktop version of the CUT K Coulomb program for local Windows use.",
+      "note": "Suitable for local classroom, lab, or office installation.",
+      "asset_name_contains": "CUT_K_Coulomb",
+      "asset_ext": ".exe",
+      "release_tag_contains": "k-coulomb"
+    }
+  ],
+
+  "documentation": [
+    {
+      "title": "CUT Bearing Capacity",
+      "tag": "Manuals / Documentation",
+      "description": "User manual, supporting documentation, and references for the CUT Bearing Capacity program.",
+      "manual_repo_folder": "programs/CUT_Bearing_Capacity",
+      "manual_file_contains": "CUT_Bearing_Capacity_User_Manual",
+      "asset_name_contains": "CUT_Bearing_capacity",
+      "asset_ext": ".exe",
+      "release_tag_contains": "",
+      "references": [
+        {
+          "text": "Pantelidis, L. (2026). Unified pseudo-static seismic reduction factors for shallow foundations via an earth-pressure framework. Soils and Foundations, 66(1), 101713. https://doi.org/10.1016/j.sandf.2025.101713"
+        },
+        {
+          "text": "Pantelidis, L. (2023). Bearing capacity of centrically-vertically loaded strip foundations based on soil parameters: A classical earth pressure analysis problem. Research Square (Preprint, Version 2). https://doi.org/10.21203/rs.3.rs-2940474/v2"
+        },
+        {
+          "text": "Pantelidis, L. (2024). Bearing capacity of shallow foundations: A focus on the depth factors in combination with the respective N-factors. Arabian Journal of Geosciences, 17(6), 169. https://doi.org/10.1007/s12517-024-11976-7"
+        },
+        {
+          "text": "Pantelidis, L., & Meddah, A. (2024). The effect of loading inclination and eccentricity on the bearing capacity of shallow foundations: A review. Archives of Computational Methods in Engineering, 31, 4189–4208. https://doi.org/10.1007/s11831-024-10113-7"
+        },
+        {
+          "text": "Pantelidis, L., Assefa, E., & Sachpazis, C. I. (2025). The effect of footing shape on the bearing capacity of shallow foundations: A review. Archives of Computational Methods in Engineering, 32, 1597–1617. https://doi.org/10.1007/s11831-024-10184-6"
+        },
+        {
+          "text": "Pantelidis, L., & Meddah, A. (2026). Theoretical investigation of the effect of soil compressibility in the context of the bearing capacity of shallow foundations. Proceedings of the 21st International Conference on Soil Mechanics and Geotechnical Engineering (Vienna, Austria, June 14–19, 2026)."
+        },
+        {
+          "text": "Pantelidis, L., Assefa, E., & Sachpazis, C. (2026). The effect of groundwater table on the bearing capacity of shallow foundations: An earth pressure analysis approach. Proceedings of the 21st International Conference on Soil Mechanics and Geotechnical Engineering (Vienna, Austria, June 14–19, 2026)."
+        }
+      ]
+    },
+    {
+      "title": "CUT K Coulomb",
+      "tag": "Manuals / Documentation",
+      "description": "User manual and references for the CUT K Coulomb program.",
+      "manual_repo_folder": "",
+      "manual_file_contains": "",
+      "asset_name_contains": "CUT_K_Coulomb",
+      "asset_ext": ".exe",
+      "release_tag_contains": "k-coulomb",
+      "references": [
+        {
+          "text": "Classical Coulomb earth-pressure theory and related developments in geotechnical engineering literature."
+        }
+      ]
+    }
+  ],
+
+  "software_citations": [
+    {
+      "title": "CUT Bearing Capacity",
+      "software_citation": "Pantelidis, L. CUT Bearing Capacity [Software]. Cyprus University of Technology.",
+      "software_citation_bibtex": "@misc{PantelidisCUTBearingCapacity,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT Bearing Capacity},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
+    },
+    {
+      "title": "CUT K Coulomb",
+      "software_citation": "Pantelidis, L. CUT K Coulomb [Software]. Cyprus University of Technology.",
+      "software_citation_bibtex": "@misc{PantelidisCUTKCoulomb,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT K Coulomb},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
+    }
+  ],
+
+  "contact_links": [
+    {
+      "label": "University Profile",
+      "url": "https://www.cut.ac.cy/faculties/fet/ceg/staff/lysandros.pantelidis/?languageId=1"
+    },
+    {
+      "label": "Google Scholar",
+      "url": "https://scholar.google.com/citations?user=u5fbtlcAAAAJ&hl=en"
+    },
+    {
+      "label": "ResearchGate",
+      "url": "https://www.researchgate.net/profile/Lysandros-Pantelidis"
+    },
+    {
+      "label": "ORCID",
+      "url": "https://orcid.org/0000-0001-5979-6937"
+    },
+    {
+      "label": "Personal Website",
+      "url": "https://lysandros.weebly.com/"
+    }
+  ],
+
+  "share_url": "https://cut-apps.streamlit.app/"
+}
+
+Thought for 10s
+Βάλε αυτά τα 4 νέα entries.
+
+Στο "web_applications" πρόσθεσε:
+
+{
+  "title": "CUT Seismic Earth Pressure Toolkit",
+  "tag": "Web application",
+  "description": "Comparative seismic earth-pressure analysis toolkit including EN 1998-5, prEN 1998-5, AASHTO, and CUT formulations, with layered soils, groundwater effects, surcharge, and active/passive pressure distributions.",
+  "url": "https://cut-seismic-earth-pressure-toolkit.streamlit.app/",
+  "note": "Suitable for desktop and mobile access.",
+  "asset_name_contains": "CUT_Seismic_Earth_Pressure_Toolkit",
+  "asset_ext": ".exe",
+  "release_tag_contains": "seismic-earth-pressure"
+}
+Στο "desktop_programs" πρόσθεσε:
+
+{
+  "title": "CUT Seismic Earth Pressure Toolkit",
+  "tag": "Windows executable (.exe)",
+  "description": "Standalone desktop version of the CUT Seismic Earth Pressure Toolkit for local execution on Windows systems.",
+  "note": "Suitable for local classroom, lab, office, and offline use.",
+  "asset_name_contains": "CUT_Seismic_Earth_Pressure_Toolkit",
+  "asset_ext": ".exe",
+  "release_tag_contains": "seismic-earth-pressure"
+}
+Στο "documentation" πρόσθεσε:
+
+{
+  "title": "CUT Seismic Earth Pressure Toolkit",
+  "tag": "Manuals / Documentation",
+  "description": "User manual and references for the CUT Seismic Earth Pressure Toolkit.",
+  "manual_repo_folder": "programs/CUT_Seismic_Earth_Pressure_Toolkit",
+  "manual_file_contains": "CUT_Seismic_Earth_Pressure_Toolkit_User_Manual",
+  "asset_name_contains": "CUT_Seismic_Earth_Pressure_Toolkit",
+  "asset_ext": ".exe",
+  "release_tag_contains": "seismic-earth-pressure",
+  "references": [
+    {
+      "text": "EN 1998-5, prEN 1998-5, AASHTO seismic earth-pressure provisions, and related geotechnical engineering literature on seismic earth pressures."
+    }
+  ]
+}
+Στο "software_citations" πρόσθεσε:
+
+{
+  "title": "CUT Seismic Earth Pressure Toolkit",
+  "software_citation": "Pantelidis, L. CUT Seismic Earth Pressure Toolkit [Software]. Cyprus University of Technology.",
+  "software_citation_bibtex": "@misc{PantelidisCUTSeismicEarthPressureToolkit,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT Seismic Earth Pressure Toolkit},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
+}
+Αν θέλεις, στο επόμενο μήνυμα μπορώ να σου δώσω και το πλήρες JSON ήδη ενημερωμένο.
+
+
+https://cut-seismic-earth-pressure-toolkit.streamlit.app/
+
+Τέλεια — τότε απλά επιβεβαιώνουμε το σωστό entry με το πραγματικό URL.
+
+Βάλε αυτό (τελική μορφή):
+
+🔹 web_applications
+{
+  "title": "CUT Seismic Earth Pressure Toolkit",
+  "tag": "Web application",
+  "description": "Comparative seismic earth-pressure analysis toolkit including EN 1998-5, prEN 1998-5, AASHTO, and CUT formulations, with layered soils, groundwater effects, surcharge, and active/passive pressure distributions.",
+  "url": "https://cut-seismic-earth-pressure-toolkit.streamlit.app/",
+  "note": "Suitable for desktop and mobile access.",
+  "asset_name_contains": "CUT_Seismic_Earth_Pressure_Toolkit",
+  "asset_ext": ".exe",
+  "release_tag_contains": "seismic-earth-pressure"
+}
+💡 Μικρή βελτίωση (προαιρετική αλλά καλή)
+Αν θες να “δέσει” με τα άλλα apps σου πιο ομοιόμορφα, μπορείς να κάνεις slightly πιο compact description:
+
+"description": "Seismic earth-pressure analysis and comparison tool (EN 1998-5, prEN 1998-5, AASHTO, CUT) with layered soils, groundwater, surcharge, and pressure distributions.",
+  "url": "https://cut-seismic-earth-pressure-toolkit.streamlit.app/",
+  "note": "Suitable for desktop and mobile access.",
+  "asset_name_contains": "CUT_Seismic_Earth_Pressure_Toolkit",
+  "asset_ext": ".exe",
+  "release_tag_contains": "seismic-earth-pressure"
+}
   ],
 
   "desktop_programs": [

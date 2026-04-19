@@ -43,17 +43,7 @@
       "asset_name_contains": "CUT_Seismic_Earth_Pressure_Toolkit",
       "asset_ext": ".exe",
       "release_tag_contains": "seismic-earth-pressure"
-    },
-	{
-	  "title": "CUT Rock Key",
-	  "tag": "Web application",
-	  "description": "Interactive rock-identification tool based on the original Rock Identification Key by Don Peck, adapted as a bilingual educational web application for step-by-step identification using observable rock properties.",
-	  "url": "https://cut-rock-key-v1.streamlit.app/",
-	  "note": "Suitable for desktop and mobile access.",
-	  "asset_name_contains": "CUT_Rock_key",
-	  "asset_ext": ".exe",
-	  "release_tag_contains": "rock-key"
-	}	
+    }
   ],
 
   "desktop_programs": [
@@ -76,6 +66,16 @@
       "release_tag_contains": "k-coulomb"
     },
     {
+      "title": "CUT K Rankine",
+      "tag": "Web application",
+      "description": "Rankine earth-pressure tool for direct evaluation of the active and passive coefficients as functions of soil friction angle and backfill angle, with integrated teaching notes on the limitations of the classical expressions for sloping backfill.",
+      "url": "https://cut-k-rankine-v6.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_K_Rankine",
+      "asset_ext": ".exe",
+      "release_tag_contains": "cut-k-rankine-v6"
+    },	
+    {
       "title": "CUT Seismic Earth Pressure Toolkit",
       "tag": "Windows executable (.exe)",
       "description": "Standalone desktop version of the CUT Seismic Earth Pressure Toolkit for local execution on Windows systems.",
@@ -83,16 +83,7 @@
       "asset_name_contains": "CUT_Seismic_Earth_Pressure_Toolkit",
       "asset_ext": ".exe",
       "release_tag_contains": "seismic-earth-pressure"
-    },
-	{
-	  "title": "CUT Rock Key",
-	  "tag": "Windows executable (.exe)",
-	  "description": "Standalone desktop version of the CUT Rock Key program for local execution on Windows systems.",
-	  "note": "Suitable for classroom, lab, office, and offline educational use.",
-	  "asset_name_contains": "CUT_Rock_key",
-	  "asset_ext": ".exe",
-	  "release_tag_contains": "rock-key"
-	}	
+    }
   ],
 
   "documentation": [
@@ -126,6 +117,16 @@
         }
       ]
     },
+	    {
+      "title": "CUT K Rankine",
+      "tag": "Web application",
+      "description": "Rankine earth-pressure tool for direct evaluation of the active and passive coefficients as functions of soil friction angle and backfill angle, with integrated teaching notes on the limitations of the classical expressions for sloping backfill.",
+      "url": "https://cut-k-rankine-v6.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_K_Rankine",
+      "asset_ext": ".exe",
+      "release_tag_contains": "cut-k-rankine-v6"
+    },
     {
       "title": "CUT Seismic Earth Pressure Toolkit",
       "tag": "Manuals / Documentation",
@@ -154,6 +155,21 @@
       "software_citation": "Pantelidis, L. CUT K Coulomb [Software]. Cyprus University of Technology.",
       "software_citation_bibtex": "@misc{PantelidisCUTKCoulomb,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT K Coulomb},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
     },
+	{
+      "title": "CUT K Rankine",
+      "tag": "Manuals / Documentation",
+      "description": "User manual and references for the CUT K Rankine program.",
+      "manual_repo_folder": "",
+      "manual_file_contains": "",
+      "asset_name_contains": "CUT_K_Rankine",
+      "asset_ext": ".exe",
+      "release_tag_contains": "cut-k-rankine-v6",
+      "references": [
+        {
+          "text": "Pantelidis, L. (2024). From EN 1998-5: 2004 to prEN 1998-5: 2023: Has the calculation of earth pressures improved or deteriorated? In Proceedings of the XVIII European Conference on Soil Mechanics and Geotechnical Engineering (ECSMGE 2024), Lisbon, Portugal, 26–30 August 2024 (pp. 733–738). CRC Press. https://doi.org/10.1201/9781003431749-121"
+        }
+      ]
+    },	
     {
       "title": "CUT Seismic Earth Pressure Toolkit",
       "software_citation": "Pantelidis, L. CUT Seismic Earth Pressure Toolkit [Software]. Cyprus University of Technology.",

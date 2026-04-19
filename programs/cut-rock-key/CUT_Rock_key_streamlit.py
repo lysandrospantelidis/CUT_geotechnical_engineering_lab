@@ -3,7 +3,7 @@ import base64
 from pathlib import Path
 import streamlit as st
 
-from CUT_Rock_key_v1 import (
+from CUT_Rock_key_data import (
     APP_LINK,
     ORIGINAL_LINK,
     ROCK_INFO_EN,

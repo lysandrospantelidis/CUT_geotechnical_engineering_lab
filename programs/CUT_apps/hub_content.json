@@ -55,7 +55,7 @@
       "note": "Suitable for desktop and mobile access.",
       "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
       "asset_ext": ".exe",
-      "release_tag_contains": "seismic-earth-pressure"
+      "release_tag_contains": "cut-seismic-earth-pressure-toolkit"
     },
     {
       "title": "CUT Rock Key",
@@ -110,7 +110,7 @@
       "note": "Suitable for local classroom, lab, office, and offline use.",
       "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
       "asset_ext": ".exe",
-      "release_tag_contains": "seismic-earth-pressure"
+      "release_tag_contains": "cut-seismic-earth-pressure-toolkit"
     },
 	{
 	  "title": "CUT Rock Key",
@@ -190,7 +190,7 @@
       "manual_file_contains": "CUT_Seismic_Earth_Pressure_Toolkit_User_Manual",
       "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
       "asset_ext": ".exe",
-      "release_tag_contains": "seismic-earth-pressure",
+      "release_tag_contains": "cut-seismic-earth-pressure-toolkit",
       "references": [
         {
           "text": "EN 1998-5, prEN 1998-5, AASHTO seismic earth-pressure provisions and related literature."

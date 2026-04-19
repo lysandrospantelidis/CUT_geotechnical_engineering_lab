@@ -13,6 +13,9 @@
   "github_repo_url": "https://github.com/lysandrospantelidis/CUT_geotechnical_engineering_lab",
   "updates_count": 5,
 
+
+
+
   "web_applications": [
     {
       "title": "CUT Bearing Capacity",
@@ -27,13 +30,23 @@
     {
       "title": "CUT K Coulomb",
       "tag": "Web application",
-      "description": "Coulomb earth-pressure tool for smooth vertical walls, developed primarily as a supporting program for CUT Bearing Capacity.",
+      "description": "Coulomb earth-pressure tool for any backslope geometry, developed primarily as a supporting program for CUT Bearing Capacity.",
       "url": "https://cut-k-coulomb-v2a.streamlit.app/",
       "note": "Suitable for desktop and mobile access.",
       "asset_name_contains": "CUT_K_Coulomb",
       "asset_ext": ".exe",
       "release_tag_contains": "k-coulomb"
     },
+    {
+      "title": "CUT K Rankine",
+      "tag": "Web application",
+      "description": "Rankine earth-pressure tool for smooth vertical walls.",
+      "url": "https://cut-k-rankine-v6.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_K_Coulomb",
+      "asset_ext": ".exe",
+      "release_tag_contains": "k-coulomb"
+    },	
     {
       "title": "CUT Seismic Earth Pressure Toolkit",
       "tag": "Web application",
@@ -43,8 +56,23 @@
       "asset_name_contains": "CUT_Seismic_Earth_Pressure_Toolkit",
       "asset_ext": ".exe",
       "release_tag_contains": "seismic-earth-pressure"
-    }
+    },
+    {
+      "title": "CUT Rock Key",
+      "tag": "Web application",
+      "description": "Interactive rock-identification tool based on the original Rock Identification Key by Don Peck, adapted as a bilingual educational web application for step-by-step identification using observable rock properties.",
+      "url": "https://cut-rock-key-v1.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_Rock_key",
+      "asset_ext": ".exe",
+      "release_tag_contains": "rock-key"
+    }	
   ],
+
+
+
+
+
 
   "desktop_programs": [
     {
@@ -83,7 +111,16 @@
       "asset_name_contains": "CUT_Seismic_Earth_Pressure_Toolkit",
       "asset_ext": ".exe",
       "release_tag_contains": "seismic-earth-pressure"
-    }
+    },
+	{
+	  "title": "CUT Rock Key",
+	  "tag": "Windows executable (.exe)",
+	  "description": "Standalone desktop version of the CUT Rock Key program for local execution on Windows systems.",
+	  "note": "Suitable for classroom, lab, office, and offline educational use.",
+	  "asset_name_contains": "CUT_Rock_key",
+	  "asset_ext": ".exe",
+	  "release_tag_contains": "rock-key"
+	}	
   ],
 
   "documentation": [
@@ -99,6 +136,24 @@
       "references": [
         {
           "text": "Pantelidis, L. (2026). Unified pseudo-static seismic reduction factors for shallow foundations via an earth-pressure framework. Soils and Foundations, 66(1), 101713. https://doi.org/10.1016/j.sandf.2025.101713"
+        },
+        {
+          "text": "Pantelidis, L. (2023). Bearing capacity of centrically-vertically loaded strip foundations based on soil parameters: A classical earth pressure analysis problem. Research Square (Preprint, Version 2). https://doi.org/10.21203/rs.3.rs-2940474/v2"
+        },
+        {
+          "text": "Pantelidis, L. (2024). Bearing capacity of shallow foundations: A focus on the depth factors in combination with the respective N-factors. Arabian Journal of Geosciences, 17(6), 169. https://doi.org/10.1007/s12517-024-11976-7"
+        },
+        {
+          "text": "Pantelidis, L., & Meddah, A. (2024). The effect of loading inclination and eccentricity on the bearing capacity of shallow foundations: A review. Archives of Computational Methods in Engineering, 31, 4189–4208. https://doi.org/10.1007/s11831-024-10113-7"
+        },
+        {
+          "text": "Pantelidis, L., Assefa, E., & Sachpazis, C. I. (2025). The effect of footing shape on the bearing capacity of shallow foundations: A review. Archives of Computational Methods in Engineering, 32, 1597–1617. https://doi.org/10.1007/s11831-024-10184-6"
+        },
+        {
+          "text": "Pantelidis, L., & Meddah, A. (2026). Theoretical investigation of the effect of soil compressibility in the context of the bearing capacity of shallow foundations. Proceedings of the 21st International Conference on Soil Mechanics and Geotechnical Engineering (Vienna, Austria, June 14–19, 2026)."
+        },
+        {
+          "text": "Pantelidis, L., Assefa, E., & Sachpazis, C. (2026). The effect of groundwater table on the bearing capacity of shallow foundations: An earth pressure analysis approach. Proceedings of the 21st International Conference on Soil Mechanics and Geotechnical Engineering (Vienna, Austria, June 14–19, 2026)."
         }
       ]
     },
@@ -174,7 +229,12 @@
       "title": "CUT Seismic Earth Pressure Toolkit",
       "software_citation": "Pantelidis, L. CUT Seismic Earth Pressure Toolkit [Software]. Cyprus University of Technology.",
       "software_citation_bibtex": "@misc{PantelidisCUTSeismicEarthPressureToolkit,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT Seismic Earth Pressure Toolkit},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
-    }
+    },
+    {
+      "title": "CUT Rock Key",
+      "software_citation": "Pantelidis, L. CUT Rock Key [Software]. Cyprus University of Technology.",
+      "software_citation_bibtex": "@misc{PantelidisCUTRockKey,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT Rock Key},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
+    }	
   ],
 
   "contact_links": [

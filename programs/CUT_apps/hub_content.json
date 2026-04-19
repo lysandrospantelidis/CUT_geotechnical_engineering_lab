@@ -53,7 +53,7 @@
       "description": "Seismic earth-pressure analysis and comparison tool (EN 1998-5, prEN 1998-5, AASHTO, CUT) with layered soils, groundwater, surcharge, and pressure distributions.",
       "url": "https://cut-seismic-earth-pressure-toolkit.streamlit.app/",
       "note": "Suitable for desktop and mobile access.",
-      "asset_name_contains": "CUT_Seismic_Earth_Pressure_Toolkit",
+      "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
       "asset_ext": ".exe",
       "release_tag_contains": "seismic-earth-pressure"
     },
@@ -108,7 +108,7 @@
       "tag": "Windows executable (.exe)",
       "description": "Standalone desktop version of the CUT Seismic Earth Pressure Toolkit for local execution on Windows systems.",
       "note": "Suitable for local classroom, lab, office, and offline use.",
-      "asset_name_contains": "CUT_Seismic_Earth_Pressure_Toolkit",
+      "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
       "asset_ext": ".exe",
       "release_tag_contains": "seismic-earth-pressure"
     },
@@ -188,7 +188,7 @@
       "description": "User manual and references for the CUT Seismic Earth Pressure Toolkit.",
       "manual_repo_folder": "programs/CUT_Seismic_Earth_Pressure_Toolkit",
       "manual_file_contains": "CUT_Seismic_Earth_Pressure_Toolkit_User_Manual",
-      "asset_name_contains": "CUT_Seismic_Earth_Pressure_Toolkit",
+      "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
       "asset_ext": ".exe",
       "release_tag_contains": "seismic-earth-pressure",
       "references": [

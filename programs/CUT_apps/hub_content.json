@@ -66,7 +66,17 @@
       "asset_name_contains": "CUT_Rock_key",
       "asset_ext": ".exe",
       "release_tag_contains": "rock-key"
-    }	
+    },
+	{
+	  "title": "jWinkler (CUT)",
+	  "tag": "Web application",
+	  "description": "Interactive web-based tool for the analysis of beams on elastic foundation using the Winkler model. The application allows definition of geometry, materials, cross-sections, and loads, and provides displacement, moment, shear, and soil pressure diagrams along with tabulated results.",
+	  "url": "https://jwinkler-v1-3.streamlit.app/",
+	  "note": "Suitable for desktop and mobile access. No installation required.",
+	  "asset_name_contains": "jwinkler",
+	  "asset_ext": ".exe",
+	  "release_tag_contains": "jwinkler"
+	}	
   ],
 
 
@@ -120,6 +130,15 @@
 	  "asset_name_contains": "CUT_Rock_key",
 	  "asset_ext": ".exe",
 	  "release_tag_contains": "rock-key"
+	},
+	{
+	  "title": "jWinkler (CUT)",
+	  "tag": "Windows executable (.exe)",
+	  "description": "Standalone desktop version of the jWinkler program for local execution on Windows systems, providing beam-on-elastic-foundation analysis with full graphical output.",
+	  "note": "Suitable for classroom, lab, office, and offline educational and research use.",
+	  "asset_name_contains": "jwinkler",
+	  "asset_ext": ".exe",
+	  "release_tag_contains": "jwinkler"
 	}	
   ],
 
@@ -234,7 +253,12 @@
       "title": "CUT Rock Key",
       "software_citation": "Pantelidis, L. CUT Rock Key [Software]. Cyprus University of Technology.",
       "software_citation_bibtex": "@misc{PantelidisCUTRockKey,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT Rock Key},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
-    }	
+    },
+	{
+	  "title": "jWinkler (CUT)",
+	  "software_citation": "Department of Civil Engineering, Aristotle University of Thessaloniki (AUTH). jWinkler: Beam on Elastic Foundation (Winkler Model) [Software]. Available at: https://edusoft.civil.auth.gr/. The present version is a Python-based web and desktop adaptation by Pantelidis, L. (Cyprus University of Technology).",
+	  "software_citation_bibtex": "@misc{AUTH_jWinkler,\n  author       = {{Department of Civil Engineering, Aristotle University of Thessaloniki}},\n  title        = {jWinkler: Beam on Elastic Foundation (Winkler Model)},\n  note         = {Software},\n  url          = {https://edusoft.civil.auth.gr/}\n}\n\n@misc{Pantelidis_jWinkler,\n  author       = {Pantelidis, Lysandros},\n  title        = {jWinkler (Web \\& Desktop Versions)},\n  institution  = {Cyprus University of Technology},\n  note         = {Python translation and interface adaptation of the AUTH jWinkler program},\n  year         = {2026}\n}"
+	}	
   ],
 
   "contact_links": [
@@ -246,3 +270,4 @@
 
   "share_url": "https://cut-apps.streamlit.app/"
 }
+s

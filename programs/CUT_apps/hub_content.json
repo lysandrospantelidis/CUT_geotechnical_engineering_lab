@@ -265,6 +265,22 @@
     {
       "label": "University Profile",
       "url": "https://www.cut.ac.cy/faculties/fet/ceg/staff/lysandros.pantelidis/?languageId=1"
+    },
+    {
+      "label": "Google Scholar",
+      "url": "https://scholar.google.com/citations?user=u5fbtlcAAAAJ&hl=en"
+    },
+    {
+      "label": "ResearchGate",
+      "url": "https://www.researchgate.net/profile/Lysandros-Pantelidis"
+    },
+    {
+      "label": "ORCID",
+      "url": "https://orcid.org/0000-0001-5979-6937"
+    },
+    {
+      "label": "Personal Website",
+      "url": "https://lysandros.weebly.com/"
     }
   ],
 

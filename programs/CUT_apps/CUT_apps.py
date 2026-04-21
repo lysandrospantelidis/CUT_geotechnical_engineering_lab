@@ -18,13 +18,6 @@ st.set_page_config(
     layout="wide",
 )
 
-if "start_time" not in st.session_state:
-    st.session_state.start_time = time.time()
-
-if "app_open_tracked" not in st.session_state:
-    track_event("app_open", page="hub")
-    st.session_state.app_open_tracked = True
-
 # -------------------------------------------------
 # CONFIG
 # -------------------------------------------------
@@ -91,6 +84,14 @@ def track_and_redirect(event_name: str, url: str, **params):
         ''',
         height=0,
     )
+
+# SESSION TRACKING
+if "start_time" not in st.session_state:
+    st.session_state.start_time = time.time()
+
+if "app_open_tracked" not in st.session_state:
+    track_event("app_open", page="hub")
+    st.session_state.app_open_tracked = True
 
 GITHUB_OWNER = cfg.get("github_owner", "").strip()
 GITHUB_REPO = cfg.get("github_repo_name", "").strip()

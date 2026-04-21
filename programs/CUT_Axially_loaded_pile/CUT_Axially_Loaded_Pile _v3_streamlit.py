@@ -382,6 +382,11 @@ def per_layer_dataframe(results):
 
 
 def build_excel_bytes(df):
+    try:
+        import openpyxl  # noqa: F401
+    except Exception:
+        return None
+
     bio = io.BytesIO()
     with pd.ExcelWriter(bio, engine="openpyxl") as writer:
         df.to_excel(writer, index=False, sheet_name="Slices")
@@ -811,8 +816,16 @@ with right:
         st.dataframe(slices_df, use_container_width=True)
         st.markdown("**Per-layer (factored)**")
         st.dataframe(per_layer_df, use_container_width=True)
-        st.download_button("Export Slices (Excel)", data=build_excel_bytes(slices_df), file_name=f"CUT_Axially_Loaded_Pile_Slices_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-        pdf_bytes = build_pdf_bytes(results, params, slices_df, per_layer_df)
+        excel_bytes = build_excel_bytes(slices_df)
+        if excel_bytes is not None:
+            st.download_button(
+                "Export Slices (Excel)",
+                data=excel_bytes,
+                file_name=f"CUT_Axially_Loaded_Pile_Slices_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+        else:
+            st.info("Install openpyxl to enable Excel export.")
         if pdf_bytes is not None:
             st.download_button("Export Report (PDF)", data=pdf_bytes, file_name=f"CUT_Axially_Loaded_Pile_Report_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf", mime="application/pdf")
         else:

@@ -52,38 +52,44 @@ def track_event(event_name: str, **params):
     )
 
 
-def redirect_to(url: str):
-    safe_url = json.dumps(url)
-    components.html(
-        f'''
-        <script>
-        const targetUrl = {safe_url};
-        window.top.location.href = targetUrl;
-        </script>
-        ''',
-        height=0,
-    )
+def get_tracking_meta(item: dict, fallback_category: str, fallback_type: str):
+    return {
+        "tracking_id": item.get("tracking_id", "").strip() or slugify(item.get("title", "item")),
+        "tracking_category": item.get("tracking_category", "").strip() or fallback_category,
+        "tracking_type": item.get("tracking_type", "").strip() or fallback_type,
+    }
 
 
-def track_and_redirect(event_name: str, url: str, **params):
-    payload = {"event_name": event_name, "url": url, **params}
-    payload_json = json.dumps(payload)
+def render_tracked_link_button(
+    label: str,
+    url: str,
+    event_name: str,
+    key_suffix: str,
+    new_tab: bool = True,
+    use_container_width: bool = True,
+    **params,
+):
+    if not url:
+        return
 
-    components.html(
-        f'''
-        <script>
-        const payload = {payload_json};
-        const {{ event_name, url, ...event_params }} = payload;
-        if (typeof window.gtag !== "undefined") {{
-            window.gtag("event", event_name, event_params);
-        }}
-        setTimeout(function() {{
-            window.top.location.href = url;
-        }}, 150);
-        </script>
-        ''',
-        height=0,
-    )
+    payload_json = json.dumps(params).replace("&", "&amp;").replace("'", "&#39;")
+    safe_url = url.replace("&", "&amp;").replace('"', "&quot;")
+    safe_label = label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    target = "_blank" if new_tab else "_self"
+    rel = "noopener noreferrer" if new_tab else ""
+
+    width_style = "display:block;width:100%;" if use_container_width else "display:inline-block;"
+    button_html = f'''
+    <a
+        href="{safe_url}"
+        target="{target}"
+        rel="{rel}"
+        class="tracked-link-button"
+        style="{width_style}"
+        onclick='(function(){{var p={payload_json}; if (typeof window.gtag !== "undefined") {{ window.gtag("event", "{event_name}", p); }} }})()'
+    >{safe_label}</a>
+    '''
+    st.markdown(button_html, unsafe_allow_html=True)
 
 # SESSION TRACKING
 if "start_time" not in st.session_state:
@@ -391,7 +397,17 @@ def render_card(item: dict, button_label: str, mode: str):
         if mode == "web":
             app_url = item.get("url", "").strip()
             if app_url:
-                st.link_button(button_label, app_url, use_container_width=True)
+                tracking = get_tracking_meta(item, "web_app", "web_app")
+                render_tracked_link_button(
+                    button_label,
+                    app_url,
+                    "open_program",
+                    key_suffix=f"open_web_{slugify(title)}",
+                    program=tracking["tracking_id"],
+                    program_title=title,
+                    category=tracking["tracking_category"],
+                    item_type=tracking["tracking_type"],
+                )
                 render_qr_block(title, app_url)
             else:
                 st.info("Web app link not provided.")
@@ -399,7 +415,17 @@ def render_card(item: dict, button_label: str, mode: str):
         elif mode == "desktop":
             exe_url = release_info["asset_url"] if release_info else ""
             if exe_url:
-                st.link_button(button_label, exe_url, use_container_width=True)
+                tracking = get_tracking_meta(item, "desktop_app", "desktop_app")
+                render_tracked_link_button(
+                    button_label,
+                    exe_url,
+                    "download_program",
+                    key_suffix=f"download_exe_{slugify(title)}",
+                    program=tracking["tracking_id"],
+                    program_title=title,
+                    category=tracking["tracking_category"],
+                    item_type=tracking["tracking_type"],
+                )
                 render_qr_block(title, exe_url)
             else:
                 st.warning("No matching .exe found in GitHub Releases.")
@@ -409,7 +435,17 @@ def render_card(item: dict, button_label: str, mode: str):
             if release_date:
                 st.markdown(f"**Release date:** {release_date}")
             if release_info.get("release_html_url"):
-                st.link_button("Open release page", release_info["release_html_url"], use_container_width=True)
+                tracking = get_tracking_meta(item, mode, mode)
+                render_tracked_link_button(
+                    "Open release page",
+                    release_info["release_html_url"],
+                    "open_release_page",
+                    key_suffix=f"release_page_{mode}_{slugify(title)}",
+                    program=tracking["tracking_id"],
+                    program_title=title,
+                    category=tracking["tracking_category"],
+                    item_type=tracking["tracking_type"],
+                )
 
         if note:
             st.markdown(f'<div class="mini-note">{note}</div>', unsafe_allow_html=True)
@@ -459,11 +495,31 @@ def render_doc_card(item: dict):
 
             with col1:
                 if manual_info.get("html_url"):
-                    st.link_button("View manual online", manual_info["html_url"], use_container_width=True)
+                    tracking = get_tracking_meta(item, "manual", "documentation")
+                    render_tracked_link_button(
+                        "View manual online",
+                        manual_info["html_url"],
+                        "view_manual",
+                        key_suffix=f"view_manual_{slugify(title)}",
+                        program=tracking["tracking_id"],
+                        program_title=title,
+                        category=tracking["tracking_category"],
+                        item_type=tracking["tracking_type"],
+                    )
 
             with col2:
                 if manual_info.get("download_url"):
-                    st.link_button("Download manual", manual_info["download_url"], use_container_width=True)
+                    tracking = get_tracking_meta(item, "manual", "documentation")
+                    render_tracked_link_button(
+                        "Download manual",
+                        manual_info["download_url"],
+                        "download_manual",
+                        key_suffix=f"download_manual_{slugify(title)}",
+                        program=tracking["tracking_id"],
+                        program_title=title,
+                        category=tracking["tracking_category"],
+                        item_type=tracking["tracking_type"],
+                    )
 
             if manual_info.get("html_url"):
                 render_qr_block(f"{title} manual", manual_info["html_url"])
@@ -505,13 +561,29 @@ def render_updates():
             label = f"{date} — {name}" if date else name
 
             if rel.get("html_url"):
-                st.link_button(label, rel["html_url"], use_container_width=True)
+                render_tracked_link_button(
+                    label,
+                    rel["html_url"],
+                    "open_release_link",
+                    key_suffix=f"release_link_{slugify(name)}_{date}",
+                    release_name=name,
+                    release_date=date,
+                    category="release_links",
+                    item_type="release_link",
+                )
     else:
         st.write("No public release links found.")
 
     if GITHUB_REPO_URL:
         st.markdown("### Repository")
-        st.link_button("Open GitHub repository", GITHUB_REPO_URL, use_container_width=True)
+        render_tracked_link_button(
+            "Open GitHub repository",
+            GITHUB_REPO_URL,
+            "open_repository",
+            key_suffix="open_github_repository",
+            category="repository",
+            item_type="repository",
+        )
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -686,6 +758,26 @@ st.markdown(
         border: 1px solid rgba(0,59,113,0.14) !important;
         box-shadow: 0 4px 12px rgba(0,59,113,0.08);
     }
+
+    .tracked-link-button {
+        background-color: #ff4b4b;
+        color: #ffffff !important;
+        text-decoration: none !important;
+        padding: 0.55rem 0.75rem;
+        border-radius: 0.5rem;
+        text-align: center;
+        font-weight: 600;
+        line-height: 1.6;
+        margin: 0.2rem 0 0.55rem 0;
+        border: 1px solid #ff4b4b;
+        box-sizing: border-box;
+    }
+
+    .tracked-link-button:hover {
+        background-color: #e13f3f;
+        border-color: #e13f3f;
+        color: #ffffff !important;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -843,19 +935,59 @@ https://cut-apps.streamlit.app/"""
         col1, col2, col3, col4, col5 = st.columns(5)
 
         with col1:
-            st.link_button("WhatsApp", wa_url, use_container_width=True)
+            render_tracked_link_button(
+                "WhatsApp",
+                wa_url,
+                "share_platform",
+                key_suffix="share_whatsapp",
+                channel="whatsapp",
+                category="share",
+                item_type="share_link",
+            )
 
         with col2:
-            st.link_button("Viber", viber_url, use_container_width=True)
+            render_tracked_link_button(
+                "Viber",
+                viber_url,
+                "share_platform",
+                key_suffix="share_viber",
+                channel="viber",
+                category="share",
+                item_type="share_link",
+            )
 
         with col3:
-            st.link_button("Email", email_url, use_container_width=True)
+            render_tracked_link_button(
+                "Email",
+                email_url,
+                "share_platform",
+                key_suffix="share_email",
+                channel="email",
+                category="share",
+                item_type="share_link",
+            )
 
         with col4:
-            st.link_button("LinkedIn", share_links["LinkedIn"], use_container_width=True)
+            render_tracked_link_button(
+                "LinkedIn",
+                share_links["LinkedIn"],
+                "share_platform",
+                key_suffix="share_linkedin",
+                channel="linkedin",
+                category="share",
+                item_type="share_link",
+            )
 
         with col5:
-            st.link_button("Facebook", share_links["Facebook"], use_container_width=True)
+            render_tracked_link_button(
+                "Facebook",
+                share_links["Facebook"],
+                "share_platform",
+                key_suffix="share_facebook",
+                channel="facebook",
+                category="share",
+                item_type="share_link",
+            )
 
         st.markdown("#### or")
 
@@ -886,7 +1018,19 @@ with tab7:
         label = item.get("label", "").strip()
         url = item.get("url", "").strip()
         if label and url:
-            st.link_button(label, url, use_container_width=True)
+            tracking_id = item.get("tracking_id", "").strip() or slugify(label)
+            tracking_category = item.get("tracking_category", "").strip() or "profile"
+            tracking_type = item.get("tracking_type", "").strip() or "external_profile"
+            render_tracked_link_button(
+                label,
+                url,
+                "open_profile_link",
+                key_suffix=f"profile_link_{slugify(label)}",
+                label=label,
+                profile_id=tracking_id,
+                category=tracking_category,
+                item_type=tracking_type,
+            )
 
     st.markdown("</div>", unsafe_allow_html=True)
 

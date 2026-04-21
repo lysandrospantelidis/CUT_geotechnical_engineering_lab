@@ -16,16 +16,18 @@ st.set_page_config(
     layout="wide",
 )
 
-# Google Analytics
-st.components.v1.html("""
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DSLG609FVJ"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-DSLG609FVJ');
-</script>
-""", height=0)
+if "ga_loaded" not in st.session_state:
+    st.session_state.ga_loaded = True
+
+    st.html("""
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DSLG609FVJ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-DSLG609FVJ');
+    </script>
+    """, unsafe_allow_javascript=True)
 
 # -------------------------------------------------
 # CONFIG

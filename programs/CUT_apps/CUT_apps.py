@@ -16,22 +16,21 @@ st.set_page_config(
     layout="wide",
 )
 
+# ✅ Google Analytics (σωστό setup για Streamlit)
 if "ga_loaded" not in st.session_state:
     st.session_state.ga_loaded = True
 
-    st.html("""
+    st.markdown(f"""
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DSLG609FVJ"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-DSLG609FVJ');
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){{dataLayer.push(arguments);}}
+        gtag('js', new Date());
+        gtag('config', 'G-DSLG609FVJ', {{
+            page_path: window.location.pathname
+        }});
     </script>
-    """, unsafe_allow_javascript=True)
-
-# -------------------------------------------------
-# CONFIG
-# -------------------------------------------------
+    """, unsafe_allow_html=True)
 BASE_DIR = Path(__file__).resolve().parent
 CONFIG_FILE = BASE_DIR / "hub_content.json"
 

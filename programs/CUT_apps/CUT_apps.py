@@ -41,16 +41,11 @@ SHARE_URL = cfg.get("share_url", "").strip()
 # -------------------------------------------------
 def inject_ga():
     ga_id = "G-DSLG609FVJ"
-    ga_html = f"""
-    <script async src="https://www.googletagmanager.com/gtag/js?id={ga_id}"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){{dataLayer.push(arguments);}}
-      gtag('js', new Date());
-      gtag('config', '{ga_id}');
-    </script>
-    """
-    st.components.v1.html(ga_html, height=0)
+
+    st.markdown(f"""
+    <img src="https://www.google-analytics.com/g/collect?v=2&tid={ga_id}&cid=555&t=pageview&_p=1"
+         style="display:none" />
+    """, unsafe_allow_html=True)
 
 if "ga_loaded" not in st.session_state:
     inject_ga()

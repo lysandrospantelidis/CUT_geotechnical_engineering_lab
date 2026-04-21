@@ -1,0 +1,307 @@
+{
+  "university_name": "Cyprus University of Technology",
+  "department_name": "Department of Civil Engineering and Geomatics",
+  "hub_title": "CUT Geotechnical Engineering Lab",
+  "hub_subtitle": "Central access point for the CUT geotechnical software suite.",
+  "logo_url": "https://www.cut.ac.cy/digitalAssets/441/441550_1cut_logo_rgb_english_Large.png",
+
+  "contact_text": "<b>Associate Professor Lysandros Pantelidis</b><br>Department of Civil Engineering and Geomatics<br>Cyprus University of Technology<br><a href='mailto:lysandros.pantelidis@cut.ac.cy'>lysandros.pantelidis@cut.ac.cy</a>",
+
+  "github_owner": "lysandrospantelidis",
+  "github_repo_name": "CUT_geotechnical_engineering_lab",
+  "github_branch": "main",
+  "github_repo_url": "https://github.com/lysandrospantelidis/CUT_geotechnical_engineering_lab",
+  "updates_count": 15,
+
+
+
+
+  "web_applications": [
+    {
+      "title": "CUT Bearing Capacity",
+      "tag": "Web application",
+      "description": "Bearing-capacity tool for shallow foundations, including soil compressibility, groundwater conditions, seismic loading, reinforcement effects, and one-layer / two-layer soil cases.",
+      "url": "https://cut-bearing-capacity-v85.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_Bearing_capacity",
+      "asset_ext": ".exe",
+      "release_tag_contains": ""
+    },
+    {
+      "title": "CUT K Coulomb",
+      "tag": "Web application",
+      "description": "Coulomb earth-pressure tool for any backslope geometry, developed primarily as a supporting program for CUT Bearing Capacity.",
+      "url": "https://cut-k-coulomb-v2a.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_K_Coulomb",
+      "asset_ext": ".exe",
+      "release_tag_contains": "k-coulomb"
+    },
+    {
+      "title": "CUT K Rankine",
+      "tag": "Web application",
+      "description": "Rankine earth-pressure tool for smooth vertical walls.",
+      "url": "https://cut-k-rankine-v6.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_K_Coulomb",
+      "asset_ext": ".exe",
+      "release_tag_contains": "k-coulomb"
+    },	
+    {
+      "title": "CUT Seismic Earth Pressure Toolkit",
+      "tag": "Web application",
+      "description": "Seismic earth-pressure analysis and comparison tool (EN 1998-5, prEN 1998-5, AASHTO, CUT) with layered soils, groundwater, surcharge, and pressure distributions.",
+      "url": "https://cut-seismic-earth-pressure-toolkit.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
+      "asset_ext": ".exe",
+      "release_tag_contains": "cut-seismic-earth-pressure-toolkit"
+    },
+    {
+      "title": "CUT Rock Key",
+      "tag": "Web application",
+      "description": "Interactive rock-identification tool based on the original Rock Identification Key by Don Peck, adapted as a bilingual educational web application for step-by-step identification using observable rock properties.",
+      "url": "https://cut-rock-key-v1.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_Rock_key",
+      "asset_ext": ".exe",
+      "release_tag_contains": "rock-key"
+    },
+	{
+	  "title": "jWinkler (CUT)",
+	  "tag": "Web application",
+	  "description": "Interactive web-based tool for the analysis of beams on elastic foundation using the Winkler model. The application allows definition of geometry, materials, cross-sections, and loads, and provides displacement, moment, shear, and soil pressure diagrams along with tabulated results.",
+	  "url": "https://jwinkler-v1-3.streamlit.app/",
+	  "note": "Suitable for desktop and mobile access. No installation required.",
+	  "asset_name_contains": "jwinkler",
+	  "asset_ext": ".exe",
+	  "release_tag_contains": "jwinkler"
+	},
+	{
+	  "title": "CUT Axially Loaded Pile",
+	  "tag": "Web application",
+	  "description": "Interactive web-based application implementing a generalized analytical method for the analysis of axially loaded piles in layered soils with arbitrary cohesion (c) and friction angle (φ). The method is based on the generalized earth pressure coefficient of Pantelidis and enables both effective and total stress analysis within a unified c–φ framework. In contrast to conventional approaches embedded in design codes (e.g. Eurocode and AASHTO), where the α-method applies to purely cohesive soils and the β-method to purely frictional soils, both are treated here as special cases of the proposed formulation. The application allows, for the first time, a fully analytical effective stress analysis of piles in cohesive–frictional soils, including multilayered profiles. It explicitly accounts for the radial stress field along the pile through depth-dependent earth pressure coefficients, varying between at-rest and intermediate passive conditions, thus capturing both bored and driven pile behavior. Features include slice-based integration of shaft resistance, base resistance estimation, load–settlement response, and detailed graphical and tabulated outputs.",
+	  "url": "https://cut-axially-loaded-pile.streamlit.app/",
+	  "note": "Suitable for desktop and mobile access. No installation required.",
+	  "asset_name_contains": "axially_loaded_pile",
+	  "asset_ext": ".exe",
+	  "release_tag_contains": "Axially-loaded-pile"
+	}	
+  ],
+
+
+
+
+
+
+  "desktop_programs": [
+    {
+      "title": "CUT Bearing Capacity",
+      "tag": "Windows executable (.exe)",
+      "description": "Standalone desktop version of the CUT Bearing Capacity program for local execution on Windows systems.",
+      "note": "Recommended for offline use and local distribution.",
+      "asset_name_contains": "CUT_Bearing_capacity",
+      "asset_ext": ".exe",
+      "release_tag_contains": ""
+    },
+    {
+      "title": "CUT K Coulomb",
+      "tag": "Windows executable (.exe)",
+      "description": "Standalone desktop version of the CUT K Coulomb program for local Windows use.",
+      "note": "Suitable for local classroom, lab, or office installation.",
+      "asset_name_contains": "CUT_K_Coulomb",
+      "asset_ext": ".exe",
+      "release_tag_contains": "k-coulomb"
+    },
+    {
+      "title": "CUT K Rankine",
+      "tag": "Web application",
+      "description": "Rankine earth-pressure tool for direct evaluation of the active and passive coefficients as functions of soil friction angle and backfill angle, with integrated teaching notes on the limitations of the classical expressions for sloping backfill.",
+      "url": "https://cut-k-rankine-v6.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_K_Rankine",
+      "asset_ext": ".exe",
+      "release_tag_contains": "cut-k-rankine-v6"
+    },	
+    {
+      "title": "CUT Seismic Earth Pressure Toolkit",
+      "tag": "Windows executable (.exe)",
+      "description": "Standalone desktop version of the CUT Seismic Earth Pressure Toolkit for local execution on Windows systems.",
+      "note": "Suitable for local classroom, lab, office, and offline use.",
+      "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
+      "asset_ext": ".exe",
+      "release_tag_contains": "cut-seismic-earth-pressure-toolkit"
+    },
+	{
+	  "title": "CUT Rock Key",
+	  "tag": "Windows executable (.exe)",
+	  "description": "Standalone desktop version of the CUT Rock Key program for local execution on Windows systems.",
+	  "note": "Suitable for classroom, lab, office, and offline educational use.",
+	  "asset_name_contains": "CUT_Rock_key",
+	  "asset_ext": ".exe",
+	  "release_tag_contains": "rock-key"
+	},
+	{
+	  "title": "jWinkler (CUT)",
+	  "tag": "Windows executable (.exe)",
+	  "description": "Standalone desktop version of the jWinkler program for local execution on Windows systems, providing beam-on-elastic-foundation analysis with full graphical output.",
+	  "note": "Suitable for classroom, lab, office, and offline educational and research use.",
+	  "asset_name_contains": "jwinkler",
+	  "asset_ext": ".exe",
+	  "release_tag_contains": "jwinkler"
+	},
+	{
+	  "title": "CUT Axially Loaded Pile",
+	  "tag": "Windows executable (.exe)",
+	  "description": "Standalone desktop application implementing a generalized analytical method for the analysis of axially loaded piles in layered soils with arbitrary cohesion (c) and friction angle (φ). The method is based on the generalized earth pressure coefficient of Pantelidis, allowing rigorous effective and total stress analysis within a unified c–φ framework. In contrast to conventional approaches embedded in design codes (e.g. Eurocode and AASHTO), where the α-method applies to purely cohesive soils and the β-method to purely frictional soils, both are treated here as special cases of the proposed formulation. The program enables, for the first time, a fully analytical effective stress analysis of piles in cohesive–frictional soils, including multilayered profiles. It explicitly accounts for the radial stress field acting along the pile through depth-dependent earth pressure coefficients, varying between at-rest and passive conditions, thus capturing both bored and driven pile behavior. Additional features include slice-based integration of shaft resistance, modeling of displacement effects via modified stress states, OCR-dependent stiffness enhancement, and detailed graphical and tabulated outputs of shaft resistance, load transfer, and soil–pile interaction.",
+	  "note": "Suitable for classroom, laboratory, office, and offline educational and research use.",
+	  "asset_name_contains": "axially_loaded_pile",
+	  "asset_ext": ".exe",
+	  "release_tag_contains": "Axially-loaded-pile"
+	}	
+  ],
+
+  "documentation": [
+    {
+      "title": "CUT Bearing Capacity",
+      "tag": "Manuals / Documentation",
+      "description": "User manual, supporting documentation, and references for the CUT Bearing Capacity program.",
+      "manual_repo_folder": "programs/CUT_Bearing_Capacity",
+      "manual_file_contains": "CUT_Bearing_Capacity_User_Manual",
+      "asset_name_contains": "CUT_Bearing_capacity",
+      "asset_ext": ".exe",
+      "release_tag_contains": "",
+      "references": [
+        {
+          "text": "Pantelidis, L. (2026). Unified pseudo-static seismic reduction factors for shallow foundations via an earth-pressure framework. Soils and Foundations, 66(1), 101713. https://doi.org/10.1016/j.sandf.2025.101713"
+        },
+        {
+          "text": "Pantelidis, L. (2023). Bearing capacity of centrically-vertically loaded strip foundations based on soil parameters: A classical earth pressure analysis problem. Research Square (Preprint, Version 2). https://doi.org/10.21203/rs.3.rs-2940474/v2"
+        },
+        {
+          "text": "Pantelidis, L. (2024). Bearing capacity of shallow foundations: A focus on the depth factors in combination with the respective N-factors. Arabian Journal of Geosciences, 17(6), 169. https://doi.org/10.1007/s12517-024-11976-7"
+        },
+        {
+          "text": "Pantelidis, L., & Meddah, A. (2024). The effect of loading inclination and eccentricity on the bearing capacity of shallow foundations: A review. Archives of Computational Methods in Engineering, 31, 4189–4208. https://doi.org/10.1007/s11831-024-10113-7"
+        },
+        {
+          "text": "Pantelidis, L., Assefa, E., & Sachpazis, C. I. (2025). The effect of footing shape on the bearing capacity of shallow foundations: A review. Archives of Computational Methods in Engineering, 32, 1597–1617. https://doi.org/10.1007/s11831-024-10184-6"
+        },
+        {
+          "text": "Pantelidis, L., & Meddah, A. (2026). Theoretical investigation of the effect of soil compressibility in the context of the bearing capacity of shallow foundations. Proceedings of the 21st International Conference on Soil Mechanics and Geotechnical Engineering (Vienna, Austria, June 14–19, 2026)."
+        },
+        {
+          "text": "Pantelidis, L., Assefa, E., & Sachpazis, C. (2026). The effect of groundwater table on the bearing capacity of shallow foundations: An earth pressure analysis approach. Proceedings of the 21st International Conference on Soil Mechanics and Geotechnical Engineering (Vienna, Austria, June 14–19, 2026)."
+        }
+      ]
+    },
+    {
+      "title": "CUT K Coulomb",
+      "tag": "Manuals / Documentation",
+      "description": "User manual and references for the CUT K Coulomb program.",
+      "manual_repo_folder": "",
+      "manual_file_contains": "",
+      "asset_name_contains": "CUT_K_Coulomb",
+      "asset_ext": ".exe",
+      "release_tag_contains": "k-coulomb",
+      "references": [
+        {
+          "text": "Classical Coulomb earth-pressure theory and related developments in geotechnical engineering literature."
+        }
+      ]
+    },
+	    {
+      "title": "CUT K Rankine",
+      "tag": "Web application",
+      "description": "Rankine earth-pressure tool for direct evaluation of the active and passive coefficients as functions of soil friction angle and backfill angle, with integrated teaching notes on the limitations of the classical expressions for sloping backfill.",
+      "url": "https://cut-k-rankine-v6.streamlit.app/",
+      "note": "Suitable for desktop and mobile access.",
+      "asset_name_contains": "CUT_K_Rankine",
+      "asset_ext": ".exe",
+      "release_tag_contains": "cut-k-rankine-v6"
+    },
+    {
+      "title": "CUT Seismic Earth Pressure Toolkit",
+      "tag": "Manuals / Documentation",
+      "description": "User manual and references for the CUT Seismic Earth Pressure Toolkit.",
+      "manual_repo_folder": "programs/CUT_Seismic_Earth_Pressure_Toolkit",
+      "manual_file_contains": "CUT_Seismic_Earth_Pressure_Toolkit_User_Manual",
+      "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
+      "asset_ext": ".exe",
+      "release_tag_contains": "cut-seismic-earth-pressure-toolkit",
+      "references": [
+        {
+          "text": "EN 1998-5, prEN 1998-5, AASHTO seismic earth-pressure provisions and related literature."
+        }
+      ]
+    }
+  ],
+
+  "software_citations": [
+    {
+      "title": "CUT Bearing Capacity",
+      "software_citation": "Pantelidis, L. CUT Bearing Capacity [Software]. Cyprus University of Technology.",
+      "software_citation_bibtex": "@misc{PantelidisCUTBearingCapacity,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT Bearing Capacity},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
+    },
+    {
+      "title": "CUT K Coulomb",
+      "software_citation": "Pantelidis, L. CUT K Coulomb [Software]. Cyprus University of Technology.",
+      "software_citation_bibtex": "@misc{PantelidisCUTKCoulomb,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT K Coulomb},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
+    },
+	{
+      "title": "CUT K Rankine",
+      "tag": "Manuals / Documentation",
+      "description": "User manual and references for the CUT K Rankine program.",
+      "manual_repo_folder": "",
+      "manual_file_contains": "",
+      "asset_name_contains": "CUT_K_Rankine",
+      "asset_ext": ".exe",
+      "release_tag_contains": "cut-k-rankine-v6",
+      "references": [
+        {
+          "text": "Pantelidis, L. (2024). From EN 1998-5: 2004 to prEN 1998-5: 2023: Has the calculation of earth pressures improved or deteriorated? In Proceedings of the XVIII European Conference on Soil Mechanics and Geotechnical Engineering (ECSMGE 2024), Lisbon, Portugal, 26–30 August 2024 (pp. 733–738). CRC Press. https://doi.org/10.1201/9781003431749-121"
+        }
+      ]
+    },	
+    {
+      "title": "CUT Seismic Earth Pressure Toolkit",
+      "software_citation": "Pantelidis, L. CUT Seismic Earth Pressure Toolkit [Software]. Cyprus University of Technology.",
+      "software_citation_bibtex": "@misc{PantelidisCUTSeismicEarthPressureToolkit,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT Seismic Earth Pressure Toolkit},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
+    },
+    {
+      "title": "CUT Rock Key",
+      "software_citation": "Pantelidis, L. CUT Rock Key [Software]. Cyprus University of Technology.",
+      "software_citation_bibtex": "@misc{PantelidisCUTRockKey,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT Rock Key},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
+    },
+	{
+	  "title": "jWinkler (CUT)",
+	  "software_citation": "Department of Civil Engineering, Aristotle University of Thessaloniki (AUTH). jWinkler: Beam on Elastic Foundation (Winkler Model) [Software]. Available at: https://edusoft.civil.auth.gr/. The present version is a Python-based web and desktop adaptation by Pantelidis, L. (Cyprus University of Technology).",
+	  "software_citation_bibtex": "@misc{AUTH_jWinkler,\n  author       = {{Department of Civil Engineering, Aristotle University of Thessaloniki}},\n  title        = {jWinkler: Beam on Elastic Foundation (Winkler Model)},\n  note         = {Software},\n  url          = {https://edusoft.civil.auth.gr/}\n}\n\n@misc{Pantelidis_jWinkler,\n  author       = {Pantelidis, Lysandros},\n  title        = {jWinkler (Web \\& Desktop Versions)},\n  institution  = {Cyprus University of Technology},\n  note         = {Python translation and interface adaptation of the AUTH jWinkler program},\n  year         = {2026}\n}"
+	}	
+  ],
+
+  "contact_links": [
+    {
+      "label": "University Profile",
+      "url": "https://www.cut.ac.cy/faculties/fet/ceg/staff/lysandros.pantelidis/?languageId=1"
+    },
+    {
+      "label": "Google Scholar",
+      "url": "https://scholar.google.com/citations?user=u5fbtlcAAAAJ&hl=en"
+    },
+    {
+      "label": "ResearchGate",
+      "url": "https://www.researchgate.net/profile/Lysandros-Pantelidis"
+    },
+    {
+      "label": "ORCID",
+      "url": "https://orcid.org/0000-0001-5979-6937"
+    },
+    {
+      "label": "Personal Website",
+      "url": "https://lysandros.weebly.com/"
+    }
+  ],
+
+  "share_url": "https://cut-apps.streamlit.app/"
+}

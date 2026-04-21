@@ -6,6 +6,16 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DSLG609FVJ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DSLG609FVJ');
+</script>
+
 import qrcode
 import streamlit as st
 from urllib.request import Request, urlopen

@@ -5,10 +5,10 @@ from io import BytesIO
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
-from urllib.request import Request, urlopen
 
 import qrcode
 import streamlit as st
+from urllib.request import Request, urlopen
 
 st.set_page_config(
     page_title="CUT Geotechnical Engineering Lab",
@@ -16,10 +16,33 @@ st.set_page_config(
     layout="wide",
 )
 
-# Google Analytics
+# -------------------------------------------------
+# CONFIG
+# -------------------------------------------------
+BASE_DIR = Path(__file__).resolve().parent
+CONFIG_FILE = BASE_DIR / "hub_content.json"
+
+if not CONFIG_FILE.exists():
+    st.error(f"Configuration file not found: {CONFIG_FILE.name}")
+    st.stop()
+
+with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+    cfg = json.load(f)
+
+GITHUB_OWNER = cfg.get("github_owner", "").strip()
+GITHUB_REPO = cfg.get("github_repo_name", "").strip()
+GITHUB_BRANCH = cfg.get("github_branch", "main").strip()
+GITHUB_REPO_URL = cfg.get("github_repo_url", "").strip()
+UPDATES_COUNT = int(cfg.get("updates_count", 5))
+SHARE_URL = cfg.get("share_url", "").strip()
+
+# -------------------------------------------------
+# GOOGLE ANALYTICS
+# -------------------------------------------------
 if "ga_loaded" not in st.session_state:
     st.session_state.ga_loaded = True
-    st.html("""
+
+    st.markdown("""
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DSLG609FVJ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -27,28 +50,14 @@ if "ga_loaded" not in st.session_state:
       gtag('js', new Date());
       gtag('config', 'G-DSLG609FVJ');
     </script>
-    """, unsafe_allow_javascript=True)
-
-# -------------------------------------------------
-# CONFIG
-# -------------------------------------------------
-cfg = {}
-
-# αν έχεις config file, φόρτωσέ το εδώ
-# π.χ.:
-# config_path = Path(__file__).with_name("config.json")
-# if config_path.exists():
-#     with open(config_path, "r", encoding="utf-8") as f:
-#         cfg = json.load(f)
+    """, unsafe_allow_html=True)
 
 # -------------------------------------------------
 # HELPERS
 # -------------------------------------------------
 def get_str(key: str, default: str = "") -> str:
     val = cfg.get(key, default)
-    if val is None:
-        return default
-    return str(val)
+    return val if isinstance(val, str) else default
 
 def slugify(text: str) -> str:
     return (

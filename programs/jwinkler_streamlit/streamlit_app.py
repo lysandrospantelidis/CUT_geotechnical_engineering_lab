@@ -448,8 +448,8 @@ def plot_result(domain: Domain, result_type: ResultsType, title: str, ylabel: st
         ax.set_title(title)
         return fig
 
-    # Display convention: in all diagrams the positive axis is shown below.
-    ys_plot = ys_real.copy()
+    # Display convention: positive values are shown below the zero axis.
+    ys_plot = -ys_real.copy()
 
     ax.axhline(0.0, lw=1.0, alpha=0.55, color="#9f9f9f")
     ax.plot(xs, ys_plot, lw=2.0, color="#1f4cff")
@@ -461,8 +461,8 @@ def plot_result(domain: Domain, result_type: ResultsType, title: str, ylabel: st
     ymin_idx = int(np.argmin(ys_real))
     ax.plot(xs[ymax_idx], ys_plot[ymax_idx], marker="o", ms=6, color="#243b63")
     ax.plot(xs[ymin_idx], ys_plot[ymin_idx], marker="o", ms=6, color="#243b63")
-    ax.annotate(f"max = {ys_real[ymax_idx]:.2f}", (xs[ymax_idx], ys_plot[ymax_idx]), xytext=(8, 8), textcoords="offset points", fontsize=9)
-    ax.annotate(f"min = {ys_real[ymin_idx]:.2f}", (xs[ymin_idx], ys_plot[ymin_idx]), xytext=(8, -16), textcoords="offset points", fontsize=9)
+    ax.annotate(f"max = {ys_real[ymax_idx]:.2f}", (xs[ymax_idx], ys_plot[ymax_idx]), xytext=(8, -16), textcoords="offset points", fontsize=9)
+    ax.annotate(f"min = {ys_real[ymin_idx]:.2f}", (xs[ymin_idx], ys_plot[ymin_idx]), xytext=(8, 8), textcoords="offset points", fontsize=9)
     ax.set_title(title)
     ax.set_xlabel("x [m]")
     ax.set_ylabel(ylabel)

@@ -816,6 +816,7 @@ with right:
         st.dataframe(slices_df, use_container_width=True)
         st.markdown("**Per-layer (factored)**")
         st.dataframe(per_layer_df, use_container_width=True)
+
         excel_bytes = build_excel_bytes(slices_df)
         if excel_bytes is not None:
             st.download_button(
@@ -826,8 +827,15 @@ with right:
             )
         else:
             st.info("Install openpyxl to enable Excel export.")
+
+        pdf_bytes = build_pdf_bytes(results, params, slices_df, per_layer_df)
         if pdf_bytes is not None:
-            st.download_button("Export Report (PDF)", data=pdf_bytes, file_name=f"CUT_Axially_Loaded_Pile_Report_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf", mime="application/pdf")
+            st.download_button(
+                "Export Report (PDF)",
+                data=pdf_bytes,
+                file_name=f"CUT_Axially_Loaded_Pile_Report_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+                mime="application/pdf"
+            )
         else:
             st.info("Install reportlab to enable PDF export in the Streamlit version.")
 

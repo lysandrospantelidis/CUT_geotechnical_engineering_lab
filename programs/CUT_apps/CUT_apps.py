@@ -5,10 +5,10 @@ from io import BytesIO
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
+from urllib.request import Request, urlopen
 
 import qrcode
 import streamlit as st
-from urllib.request import Request, urlopen
 
 st.set_page_config(
     page_title="CUT Geotechnical Engineering Lab",
@@ -39,18 +39,21 @@ SHARE_URL = cfg.get("share_url", "").strip()
 # -------------------------------------------------
 # GOOGLE ANALYTICS
 # -------------------------------------------------
-if "ga_loaded" not in st.session_state:
-    st.session_state.ga_loaded = True
-
-    st.markdown("""
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DSLG609FVJ"></script>
+def inject_ga() -> None:
+    ga_id = "G-DSLG609FVJ"
+    st.html(f"""
+    <script async src="https://www.googletagmanager.com/gtag/js?id={ga_id}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
+      function gtag(){{dataLayer.push(arguments);}}
       gtag('js', new Date());
-      gtag('config', 'G-DSLG609FVJ');
+      gtag('config', '{ga_id}');
     </script>
-    """, unsafe_allow_html=True)
+    """, unsafe_allow_javascript=True)
+
+if "ga_loaded" not in st.session_state:
+    inject_ga()
+    st.session_state.ga_loaded = True
 
 # -------------------------------------------------
 # HELPERS

@@ -39,7 +39,7 @@ SHARE_URL = cfg.get("share_url", "").strip()
 # -------------------------------------------------
 # GOOGLE ANALYTICS
 # -------------------------------------------------
-def inject_ga() -> None:
+def inject_ga():
     ga_id = "G-DSLG609FVJ"
     st.html(f"""
     <script async src="https://www.googletagmanager.com/gtag/js?id={ga_id}"></script>

@@ -4,18 +4,12 @@
   "hub_title": "CUT Geotechnical Engineering Lab",
   "hub_subtitle": "Central access point for the CUT geotechnical software suite.",
   "logo_url": "https://www.cut.ac.cy/digitalAssets/441/441550_1cut_logo_rgb_english_Large.png",
-
   "contact_text": "<b>Associate Professor Lysandros Pantelidis</b><br>Department of Civil Engineering and Geomatics<br>Cyprus University of Technology<br><a href='mailto:lysandros.pantelidis@cut.ac.cy'>lysandros.pantelidis@cut.ac.cy</a>",
-
   "github_owner": "lysandrospantelidis",
   "github_repo_name": "CUT_geotechnical_engineering_lab",
   "github_branch": "main",
   "github_repo_url": "https://github.com/lysandrospantelidis/CUT_geotechnical_engineering_lab",
   "updates_count": 15,
-
-
-
-
   "web_applications": [
     {
       "title": "CUT Bearing Capacity",
@@ -25,7 +19,10 @@
       "note": "Suitable for desktop and mobile access.",
       "asset_name_contains": "CUT_Bearing_capacity",
       "asset_ext": ".exe",
-      "release_tag_contains": ""
+      "release_tag_contains": "",
+      "tracking_id": "cut_bearing_capacity",
+      "tracking_category": "bearing_capacity",
+      "tracking_type": "web_app"
     },
     {
       "title": "CUT K Coulomb",
@@ -35,7 +32,10 @@
       "note": "Suitable for desktop and mobile access.",
       "asset_name_contains": "CUT_K_Coulomb",
       "asset_ext": ".exe",
-      "release_tag_contains": "k-coulomb"
+      "release_tag_contains": "k-coulomb",
+      "tracking_id": "cut_k_coulomb",
+      "tracking_category": "earth_pressure",
+      "tracking_type": "web_app"
     },
     {
       "title": "CUT K Rankine",
@@ -45,8 +45,11 @@
       "note": "Suitable for desktop and mobile access.",
       "asset_name_contains": "CUT_K_Coulomb",
       "asset_ext": ".exe",
-      "release_tag_contains": "k-coulomb"
-    },	
+      "release_tag_contains": "k-coulomb",
+      "tracking_id": "cut_k_rankine",
+      "tracking_category": "earth_pressure",
+      "tracking_type": "web_app"
+    },
     {
       "title": "CUT Seismic Earth Pressure Toolkit",
       "tag": "Web application",
@@ -55,7 +58,10 @@
       "note": "Suitable for desktop and mobile access.",
       "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
       "asset_ext": ".exe",
-      "release_tag_contains": "cut-seismic-earth-pressure-toolkit"
+      "release_tag_contains": "cut-seismic-earth-pressure-toolkit",
+      "tracking_id": "cut_seismic_earth_pressure_toolkit",
+      "tracking_category": "earth_pressure",
+      "tracking_type": "web_app"
     },
     {
       "title": "CUT Rock Key",
@@ -65,35 +71,38 @@
       "note": "Suitable for desktop and mobile access.",
       "asset_name_contains": "CUT_Rock_key",
       "asset_ext": ".exe",
-      "release_tag_contains": "rock-key"
+      "release_tag_contains": "rock-key",
+      "tracking_id": "cut_rock_key",
+      "tracking_category": "engineering_geology",
+      "tracking_type": "web_app"
     },
-	{
-	  "title": "jWinkler (CUT)",
-	  "tag": "Web application",
-	  "description": "Interactive web-based tool for the analysis of beams on elastic foundation using the Winkler model. The application allows definition of geometry, materials, cross-sections, and loads, and provides displacement, moment, shear, and soil pressure diagrams along with tabulated results.",
-	  "url": "https://jwinkler-v1-3.streamlit.app/",
-	  "note": "Suitable for desktop and mobile access. No installation required.",
-	  "asset_name_contains": "jwinkler",
-	  "asset_ext": ".exe",
-	  "release_tag_contains": "jwinkler"
-	},
-	{
-	  "title": "CUT Axially Loaded Pile",
-	  "tag": "Web application",
-	  "description": "Interactive web-based application implementing a generalized analytical method for the analysis of axially loaded piles in layered soils with arbitrary cohesion (c) and friction angle (φ). The method is based on the generalized earth pressure coefficient of Pantelidis and enables both effective and total stress analysis within a unified c–φ framework. In contrast to conventional approaches embedded in design codes (e.g. Eurocode and AASHTO), where the α-method applies to purely cohesive soils and the β-method to purely frictional soils, both are treated here as special cases of the proposed formulation. The application allows, for the first time, a fully analytical effective stress analysis of piles in cohesive–frictional soils, including multilayered profiles. It explicitly accounts for the radial stress field along the pile through depth-dependent earth pressure coefficients, varying between at-rest and intermediate passive conditions, thus capturing both bored and driven pile behavior. Features include slice-based integration of shaft resistance, base resistance estimation, load–settlement response, and detailed graphical and tabulated outputs.",
-	  "url": "https://cut-axially-loaded-pile.streamlit.app/",
-	  "note": "Suitable for desktop and mobile access. No installation required.",
-	  "asset_name_contains": "axially_loaded_pile",
-	  "asset_ext": ".exe",
-	  "release_tag_contains": "Axially-loaded-pile"
-	}	
+    {
+      "title": "jWinkler (CUT)",
+      "tag": "Web application",
+      "description": "Interactive web-based tool for the analysis of beams on elastic foundation using the Winkler model. The application allows definition of geometry, materials, cross-sections, and loads, and provides displacement, moment, shear, and soil pressure diagrams along with tabulated results.",
+      "url": "https://jwinkler-v1-3.streamlit.app/",
+      "note": "Suitable for desktop and mobile access. No installation required.",
+      "asset_name_contains": "jwinkler",
+      "asset_ext": ".exe",
+      "release_tag_contains": "jwinkler",
+      "tracking_id": "jwinkler_cut",
+      "tracking_category": "soil_structure_interaction",
+      "tracking_type": "web_app"
+    },
+    {
+      "title": "CUT Axially Loaded Pile",
+      "tag": "Web application",
+      "description": "Interactive web-based application implementing a generalized analytical method for the analysis of axially loaded piles in layered soils with arbitrary cohesion (c) and friction angle (φ). The method is based on the generalized earth pressure coefficient of Pantelidis and enables both effective and total stress analysis within a unified c–φ framework. In contrast to conventional approaches embedded in design codes (e.g. Eurocode and AASHTO), where the α-method applies to purely cohesive soils and the β-method to purely frictional soils, both are treated here as special cases of the proposed formulation. The application allows, for the first time, a fully analytical effective stress analysis of piles in cohesive–frictional soils, including multilayered profiles. It explicitly accounts for the radial stress field along the pile through depth-dependent earth pressure coefficients, varying between at-rest and intermediate passive conditions, thus capturing both bored and driven pile behavior. Features include slice-based integration of shaft resistance, base resistance estimation, load–settlement response, and detailed graphical and tabulated outputs.",
+      "url": "https://cut-axially-loaded-pile.streamlit.app/",
+      "note": "Suitable for desktop and mobile access. No installation required.",
+      "asset_name_contains": "axially_loaded_pile",
+      "asset_ext": ".exe",
+      "release_tag_contains": "Axially-loaded-pile",
+      "tracking_id": "cut_axially_loaded_pile",
+      "tracking_category": "deep_foundations",
+      "tracking_type": "web_app"
+    }
   ],
-
-
-
-
-
-
   "desktop_programs": [
     {
       "title": "CUT Bearing Capacity",
@@ -102,7 +111,10 @@
       "note": "Recommended for offline use and local distribution.",
       "asset_name_contains": "CUT_Bearing_capacity",
       "asset_ext": ".exe",
-      "release_tag_contains": ""
+      "release_tag_contains": "",
+      "tracking_id": "cut_bearing_capacity",
+      "tracking_category": "bearing_capacity",
+      "tracking_type": "desktop_app"
     },
     {
       "title": "CUT K Coulomb",
@@ -111,7 +123,10 @@
       "note": "Suitable for local classroom, lab, or office installation.",
       "asset_name_contains": "CUT_K_Coulomb",
       "asset_ext": ".exe",
-      "release_tag_contains": "k-coulomb"
+      "release_tag_contains": "k-coulomb",
+      "tracking_id": "cut_k_coulomb",
+      "tracking_category": "earth_pressure",
+      "tracking_type": "desktop_app"
     },
     {
       "title": "CUT K Rankine",
@@ -121,8 +136,11 @@
       "note": "Suitable for desktop and mobile access.",
       "asset_name_contains": "CUT_K_Rankine",
       "asset_ext": ".exe",
-      "release_tag_contains": "cut-k-rankine-v6"
-    },	
+      "release_tag_contains": "cut-k-rankine-v6",
+      "tracking_id": "cut_k_rankine",
+      "tracking_category": "earth_pressure",
+      "tracking_type": "desktop_app"
+    },
     {
       "title": "CUT Seismic Earth Pressure Toolkit",
       "tag": "Windows executable (.exe)",
@@ -130,37 +148,48 @@
       "note": "Suitable for local classroom, lab, office, and offline use.",
       "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
       "asset_ext": ".exe",
-      "release_tag_contains": "cut-seismic-earth-pressure-toolkit"
+      "release_tag_contains": "cut-seismic-earth-pressure-toolkit",
+      "tracking_id": "cut_seismic_earth_pressure_toolkit",
+      "tracking_category": "earth_pressure",
+      "tracking_type": "desktop_app"
     },
-	{
-	  "title": "CUT Rock Key",
-	  "tag": "Windows executable (.exe)",
-	  "description": "Standalone desktop version of the CUT Rock Key program for local execution on Windows systems.",
-	  "note": "Suitable for classroom, lab, office, and offline educational use.",
-	  "asset_name_contains": "CUT_Rock_key",
-	  "asset_ext": ".exe",
-	  "release_tag_contains": "rock-key"
-	},
-	{
-	  "title": "jWinkler (CUT)",
-	  "tag": "Windows executable (.exe)",
-	  "description": "Standalone desktop version of the jWinkler program for local execution on Windows systems, providing beam-on-elastic-foundation analysis with full graphical output.",
-	  "note": "Suitable for classroom, lab, office, and offline educational and research use.",
-	  "asset_name_contains": "jwinkler",
-	  "asset_ext": ".exe",
-	  "release_tag_contains": "jwinkler"
-	},
-	{
-	  "title": "CUT Axially Loaded Pile",
-	  "tag": "Windows executable (.exe)",
-	  "description": "Standalone desktop application implementing a generalized analytical method for the analysis of axially loaded piles in layered soils with arbitrary cohesion (c) and friction angle (φ). The method is based on the generalized earth pressure coefficient of Pantelidis, allowing rigorous effective and total stress analysis within a unified c–φ framework. In contrast to conventional approaches embedded in design codes (e.g. Eurocode and AASHTO), where the α-method applies to purely cohesive soils and the β-method to purely frictional soils, both are treated here as special cases of the proposed formulation. The program enables, for the first time, a fully analytical effective stress analysis of piles in cohesive–frictional soils, including multilayered profiles. It explicitly accounts for the radial stress field acting along the pile through depth-dependent earth pressure coefficients, varying between at-rest and passive conditions, thus capturing both bored and driven pile behavior. Additional features include slice-based integration of shaft resistance, modeling of displacement effects via modified stress states, OCR-dependent stiffness enhancement, and detailed graphical and tabulated outputs of shaft resistance, load transfer, and soil–pile interaction.",
-	  "note": "Suitable for classroom, laboratory, office, and offline educational and research use.",
-	  "asset_name_contains": "axially_loaded_pile",
-	  "asset_ext": ".exe",
-	  "release_tag_contains": "Axially-loaded-pile"
-	}	
+    {
+      "title": "CUT Rock Key",
+      "tag": "Windows executable (.exe)",
+      "description": "Standalone desktop version of the CUT Rock Key program for local execution on Windows systems.",
+      "note": "Suitable for classroom, lab, office, and offline educational use.",
+      "asset_name_contains": "CUT_Rock_key",
+      "asset_ext": ".exe",
+      "release_tag_contains": "rock-key",
+      "tracking_id": "cut_rock_key",
+      "tracking_category": "engineering_geology",
+      "tracking_type": "desktop_app"
+    },
+    {
+      "title": "jWinkler (CUT)",
+      "tag": "Windows executable (.exe)",
+      "description": "Standalone desktop version of the jWinkler program for local execution on Windows systems, providing beam-on-elastic-foundation analysis with full graphical output.",
+      "note": "Suitable for classroom, lab, office, and offline educational and research use.",
+      "asset_name_contains": "jwinkler",
+      "asset_ext": ".exe",
+      "release_tag_contains": "jwinkler",
+      "tracking_id": "jwinkler_cut",
+      "tracking_category": "soil_structure_interaction",
+      "tracking_type": "desktop_app"
+    },
+    {
+      "title": "CUT Axially Loaded Pile",
+      "tag": "Windows executable (.exe)",
+      "description": "Standalone desktop application implementing a generalized analytical method for the analysis of axially loaded piles in layered soils with arbitrary cohesion (c) and friction angle (φ). The method is based on the generalized earth pressure coefficient of Pantelidis, allowing rigorous effective and total stress analysis within a unified c–φ framework. In contrast to conventional approaches embedded in design codes (e.g. Eurocode and AASHTO), where the α-method applies to purely cohesive soils and the β-method to purely frictional soils, both are treated here as special cases of the proposed formulation. The program enables, for the first time, a fully analytical effective stress analysis of piles in cohesive–frictional soils, including multilayered profiles. It explicitly accounts for the radial stress field acting along the pile through depth-dependent earth pressure coefficients, varying between at-rest and passive conditions, thus capturing both bored and driven pile behavior. Additional features include slice-based integration of shaft resistance, modeling of displacement effects via modified stress states, OCR-dependent stiffness enhancement, and detailed graphical and tabulated outputs of shaft resistance, load transfer, and soil–pile interaction.",
+      "note": "Suitable for classroom, laboratory, office, and offline educational and research use.",
+      "asset_name_contains": "axially_loaded_pile",
+      "asset_ext": ".exe",
+      "release_tag_contains": "Axially-loaded-pile",
+      "tracking_id": "cut_axially_loaded_pile",
+      "tracking_category": "deep_foundations",
+      "tracking_type": "desktop_app"
+    }
   ],
-
   "documentation": [
     {
       "title": "CUT Bearing Capacity",
@@ -193,7 +222,10 @@
         {
           "text": "Pantelidis, L., Assefa, E., & Sachpazis, C. (2026). The effect of groundwater table on the bearing capacity of shallow foundations: An earth pressure analysis approach. Proceedings of the 21st International Conference on Soil Mechanics and Geotechnical Engineering (Vienna, Austria, June 14–19, 2026)."
         }
-      ]
+      ],
+      "tracking_id": "cut_bearing_capacity",
+      "tracking_category": "bearing_capacity",
+      "tracking_type": "documentation"
     },
     {
       "title": "CUT K Coulomb",
@@ -208,9 +240,12 @@
         {
           "text": "Classical Coulomb earth-pressure theory and related developments in geotechnical engineering literature."
         }
-      ]
+      ],
+      "tracking_id": "cut_k_coulomb",
+      "tracking_category": "earth_pressure",
+      "tracking_type": "documentation"
     },
-	    {
+    {
       "title": "CUT K Rankine",
       "tag": "Web application",
       "description": "Rankine earth-pressure tool for direct evaluation of the active and passive coefficients as functions of soil friction angle and backfill angle, with integrated teaching notes on the limitations of the classical expressions for sloping backfill.",
@@ -218,7 +253,10 @@
       "note": "Suitable for desktop and mobile access.",
       "asset_name_contains": "CUT_K_Rankine",
       "asset_ext": ".exe",
-      "release_tag_contains": "cut-k-rankine-v6"
+      "release_tag_contains": "cut-k-rankine-v6",
+      "tracking_id": "cut_k_rankine",
+      "tracking_category": "earth_pressure",
+      "tracking_type": "documentation"
     },
     {
       "title": "CUT Seismic Earth Pressure Toolkit",
@@ -233,10 +271,12 @@
         {
           "text": "EN 1998-5, prEN 1998-5, AASHTO seismic earth-pressure provisions and related literature."
         }
-      ]
+      ],
+      "tracking_id": "cut_seismic_earth_pressure_toolkit",
+      "tracking_category": "earth_pressure",
+      "tracking_type": "documentation"
     }
   ],
-
   "software_citations": [
     {
       "title": "CUT Bearing Capacity",
@@ -248,7 +288,7 @@
       "software_citation": "Pantelidis, L. CUT K Coulomb [Software]. Cyprus University of Technology.",
       "software_citation_bibtex": "@misc{PantelidisCUTKCoulomb,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT K Coulomb},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
     },
-	{
+    {
       "title": "CUT K Rankine",
       "tag": "Manuals / Documentation",
       "description": "User manual and references for the CUT K Rankine program.",
@@ -262,7 +302,7 @@
           "text": "Pantelidis, L. (2024). From EN 1998-5: 2004 to prEN 1998-5: 2023: Has the calculation of earth pressures improved or deteriorated? In Proceedings of the XVIII European Conference on Soil Mechanics and Geotechnical Engineering (ECSMGE 2024), Lisbon, Portugal, 26–30 August 2024 (pp. 733–738). CRC Press. https://doi.org/10.1201/9781003431749-121"
         }
       ]
-    },	
+    },
     {
       "title": "CUT Seismic Earth Pressure Toolkit",
       "software_citation": "Pantelidis, L. CUT Seismic Earth Pressure Toolkit [Software]. Cyprus University of Technology.",
@@ -273,35 +313,59 @@
       "software_citation": "Pantelidis, L. CUT Rock Key [Software]. Cyprus University of Technology.",
       "software_citation_bibtex": "@misc{PantelidisCUTRockKey,\n  author       = {Pantelidis, Lysandros},\n  title        = {CUT Rock Key},\n  institution  = {Cyprus University of Technology},\n  note         = {Software}\n}"
     },
-	{
-	  "title": "jWinkler (CUT)",
-	  "software_citation": "Department of Civil Engineering, Aristotle University of Thessaloniki (AUTH). jWinkler: Beam on Elastic Foundation (Winkler Model) [Software]. Available at: https://edusoft.civil.auth.gr/. The present version is a Python-based web and desktop adaptation by Pantelidis, L. (Cyprus University of Technology).",
-	  "software_citation_bibtex": "@misc{AUTH_jWinkler,\n  author       = {{Department of Civil Engineering, Aristotle University of Thessaloniki}},\n  title        = {jWinkler: Beam on Elastic Foundation (Winkler Model)},\n  note         = {Software},\n  url          = {https://edusoft.civil.auth.gr/}\n}\n\n@misc{Pantelidis_jWinkler,\n  author       = {Pantelidis, Lysandros},\n  title        = {jWinkler (Web \\& Desktop Versions)},\n  institution  = {Cyprus University of Technology},\n  note         = {Python translation and interface adaptation of the AUTH jWinkler program},\n  year         = {2026}\n}"
-	}	
+    {
+      "title": "jWinkler (CUT)",
+      "software_citation": "Department of Civil Engineering, Aristotle University of Thessaloniki (AUTH). jWinkler: Beam on Elastic Foundation (Winkler Model) [Software]. Available at: https://edusoft.civil.auth.gr/. The present version is a Python-based web and desktop adaptation by Pantelidis, L. (Cyprus University of Technology).",
+      "software_citation_bibtex": "@misc{AUTH_jWinkler,\n  author       = {{Department of Civil Engineering, Aristotle University of Thessaloniki}},\n  title        = {jWinkler: Beam on Elastic Foundation (Winkler Model)},\n  note         = {Software},\n  url          = {https://edusoft.civil.auth.gr/}\n}\n\n@misc{Pantelidis_jWinkler,\n  author       = {Pantelidis, Lysandros},\n  title        = {jWinkler (Web \\& Desktop Versions)},\n  institution  = {Cyprus University of Technology},\n  note         = {Python translation and interface adaptation of the AUTH jWinkler program},\n  year         = {2026}\n}"
+    }
   ],
-
   "contact_links": [
     {
       "label": "University Profile",
-      "url": "https://www.cut.ac.cy/faculties/fet/ceg/staff/lysandros.pantelidis/?languageId=1"
+      "url": "https://www.cut.ac.cy/faculties/fet/ceg/staff/lysandros.pantelidis/?languageId=1",
+      "tracking_id": "university_profile",
+      "tracking_category": "profile",
+      "tracking_type": "external_profile"
     },
     {
       "label": "Google Scholar",
-      "url": "https://scholar.google.com/citations?user=u5fbtlcAAAAJ&hl=en"
+      "url": "https://scholar.google.com/citations?user=u5fbtlcAAAAJ&hl=en",
+      "tracking_id": "google_scholar",
+      "tracking_category": "profile",
+      "tracking_type": "external_profile"
     },
     {
       "label": "ResearchGate",
-      "url": "https://www.researchgate.net/profile/Lysandros-Pantelidis"
+      "url": "https://www.researchgate.net/profile/Lysandros-Pantelidis",
+      "tracking_id": "researchgate",
+      "tracking_category": "profile",
+      "tracking_type": "external_profile"
     },
     {
       "label": "ORCID",
-      "url": "https://orcid.org/0000-0001-5979-6937"
+      "url": "https://orcid.org/0000-0001-5979-6937",
+      "tracking_id": "orcid",
+      "tracking_category": "profile",
+      "tracking_type": "external_profile"
     },
     {
       "label": "Personal Website",
-      "url": "https://lysandros.weebly.com/"
+      "url": "https://lysandros.weebly.com/",
+      "tracking_id": "personal_website",
+      "tracking_category": "profile",
+      "tracking_type": "external_profile"
     }
   ],
-
-  "share_url": "https://cut-apps.streamlit.app/"
+  "share_url": "https://cut-apps.streamlit.app/",
+  "analytics_defaults": {
+    "platform_name": "cut_geotechnical_engineering_lab",
+    "ga_event_namespace": "cut_apps",
+    "track_tabs": true,
+    "track_web_apps": true,
+    "track_desktop_downloads": true,
+    "track_manual_links": true,
+    "track_release_links": true,
+    "track_share_links": true,
+    "track_profile_links": true
+  }
 }

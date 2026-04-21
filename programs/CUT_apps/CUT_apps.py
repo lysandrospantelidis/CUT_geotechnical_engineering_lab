@@ -72,43 +72,39 @@ def render_tracked_link_button(
     if not url:
         return
 
-    payload_json = json.dumps(params)
-    safe_url = json.dumps(url)
+    payload_json = json.dumps(params).replace("&", "&amp;").replace("'", "&#39;")
+    safe_url = url.replace("&", "&amp;").replace('"', "&quot;")
     safe_label = button_text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     target = "_blank" if new_tab else "_self"
+    rel = "noopener noreferrer" if new_tab else ""
 
     width_style = "display:block;width:100%;" if use_container_width else "display:inline-block;"
 
-    html = f"""
+    button_html = f"""
     <div style="margin:0.2rem 0 0.55rem 0;">
-      <a
-        href={safe_url}
-        target="{target}"
-        rel="noopener noreferrer"
-        onclick='(function() {{
-            var p = {payload_json};
-            if (typeof window.gtag !== "undefined") {{
-                window.gtag("event", "{event_name}", p);
-            }}
-        }})()'
-        style="
-            {width_style}
-            background-color:#ff4b4b;
-            color:#ffffff;
-            text-decoration:none;
-            padding:0.55rem 0.75rem;
-            border-radius:0.5rem;
-            text-align:center;
-            font-weight:600;
-            line-height:1.6;
-            border:1px solid #ff4b4b;
-            box-sizing:border-box;
-        "
-      >{safe_label}</a>
+        <a
+            href="{safe_url}"
+            target="{target}"
+            rel="{rel}"
+            class="tracked-link-button"
+            style="
+                {width_style}
+                background-color:#ff4b4b;
+                color:#ffffff;
+                text-decoration:none;
+                padding:0.55rem 0.75rem;
+                border-radius:0.5rem;
+                text-align:center;
+                font-weight:600;
+                line-height:1.6;
+                border:1px solid #ff4b4b;
+                box-sizing:border-box;
+            "
+            onclick='(function(){{var p={payload_json}; if (typeof window.gtag !== "undefined") {{ window.gtag("event", "{event_name}", p); }} }})()'
+        >{safe_label}</a>
     </div>
     """
-
-    components.html(html, height=52)
+    components.html(button_html, height=70)
     if not url:
         return
 

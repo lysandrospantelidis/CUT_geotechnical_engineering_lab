@@ -16,6 +16,7 @@ st.set_page_config(
     layout="wide",
 )
 
+# Google Analytics
 if "ga_loaded" not in st.session_state:
     st.session_state.ga_loaded = True
     st.html("""
@@ -29,12 +30,25 @@ if "ga_loaded" not in st.session_state:
     """, unsafe_allow_javascript=True)
 
 # -------------------------------------------------
+# CONFIG
+# -------------------------------------------------
+cfg = {}
+
+# αν έχεις config file, φόρτωσέ το εδώ
+# π.χ.:
+# config_path = Path(__file__).with_name("config.json")
+# if config_path.exists():
+#     with open(config_path, "r", encoding="utf-8") as f:
+#         cfg = json.load(f)
+
+# -------------------------------------------------
 # HELPERS
 # -------------------------------------------------
 def get_str(key: str, default: str = "") -> str:
     val = cfg.get(key, default)
-    return val if isinstance(val, str) else default
-
+    if val is None:
+        return default
+    return str(val)
 
 def slugify(text: str) -> str:
     return (

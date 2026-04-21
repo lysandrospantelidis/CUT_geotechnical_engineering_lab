@@ -1,4 +1,4 @@
-streamlit>=1.44
+https://github.com/lysandrospantelidis/streamlit-analytics/raw/main/streamlit-1.44.0-py3-none-any.whl
 pandas>=2.2
 numpy>=2.0
 matplotlib>=3.8

@@ -119,17 +119,19 @@ def render_tracked_link_button(
     rel = "noopener noreferrer" if new_tab else ""
 
     width_style = "display:block;width:100%;" if use_container_width else "display:inline-block;"
-    button_html = f'''
-    <a
-        href="{safe_url}"
-        target="{target}"
-        rel="{rel}"
-        class="tracked-link-button"
-        style="{width_style}"
-        onclick='(function(){{var p={payload_json}; if (typeof window.gtag !== "undefined") {{ window.gtag("event", "{event_name}", p); }} }})()'
-    >{safe_label}</a>
-    '''
-    st.markdown(button_html, unsafe_allow_html=True)
+    button_html = f"""
+    <div style="margin:0.2rem 0 0.55rem 0;">
+        <a
+            href="{safe_url}"
+            target="{target}"
+            rel="{rel}"
+            class="tracked-link-button"
+            style="{width_style}"
+            onclick='(function(){{var p={payload_json}; if (typeof window.gtag !== "undefined") {{ window.gtag("event", "{event_name}", p); }} }})()'
+        >{safe_label}</a>
+    </div>
+    """
+    components.html(button_html, height=60)
 
 # SESSION TRACKING
 if "start_time" not in st.session_state:

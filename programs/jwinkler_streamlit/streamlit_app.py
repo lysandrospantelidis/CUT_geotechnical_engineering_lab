@@ -365,7 +365,7 @@ def _draw_moment(ax, x: float, y: float, value: float, side_index: int = 0):
         dx, dy = -np.sin(ang), np.cos(ang)  # tangent in CCW direction
         ax.annotate("", xy=(tx, ty), xytext=(tx - 0.16*dx, ty - 0.16*dy),
                     arrowprops=dict(arrowstyle="-|>", lw=2.2, color=color, mutation_scale=18))
-        ax.text(x + 0.26, cy + 0.06, f"M = {abs(value):.2f} kNm (CCW)", color=color, fontsize=9, ha="left")
+        ax.text(x + 0.26, cy + 0.06, f"M = {value:.2f} kNm", color=color, fontsize=9, ha="left")
     else:
         arc = patches.Arc((x, cy), 2*r, 2*r, angle=0, theta1=205, theta2=505, lw=2.2, color=color)
         ax.add_patch(arc)
@@ -374,7 +374,7 @@ def _draw_moment(ax, x: float, y: float, value: float, side_index: int = 0):
         dx, dy = np.sin(ang), -np.cos(ang)  # tangent in CW direction
         ax.annotate("", xy=(tx, ty), xytext=(tx - 0.16*dx, ty - 0.16*dy),
                     arrowprops=dict(arrowstyle="-|>", lw=2.2, color=color, mutation_scale=18))
-        ax.text(x + 0.26, cy + 0.06, f"M = {abs(value):.2f} kNm (CW)", color=color, fontsize=9, ha="left")
+        ax.text(x + 0.26, cy + 0.06, f"M = {value:.2f} kNm", color=color, fontsize=9, ha="left")
 
 
 def plot_geometry(domain: Domain):

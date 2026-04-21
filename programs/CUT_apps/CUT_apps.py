@@ -5,10 +5,10 @@ from io import BytesIO
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
-from urllib.request import Request, urlopen
 
 import qrcode
 import streamlit as st
+from urllib.request import Request, urlopen
 
 st.set_page_config(
     page_title="CUT Geotechnical Engineering Lab",
@@ -35,21 +35,6 @@ GITHUB_BRANCH = cfg.get("github_branch", "main").strip()
 GITHUB_REPO_URL = cfg.get("github_repo_url", "").strip()
 UPDATES_COUNT = int(cfg.get("updates_count", 5))
 SHARE_URL = cfg.get("share_url", "").strip()
-
-# -------------------------------------------------
-# GOOGLE ANALYTICS
-# -------------------------------------------------
-def inject_ga():
-    ga_id = "G-DSLG609FVJ"
-
-    st.markdown(f"""
-    <img src="https://www.google-analytics.com/g/collect?v=2&tid={ga_id}&cid=555&t=pageview&_p=1"
-         style="display:none" />
-    """, unsafe_allow_html=True)
-
-if "ga_loaded" not in st.session_state:
-    inject_ga()
-    st.session_state.ga_loaded = True
 
 # -------------------------------------------------
 # HELPERS

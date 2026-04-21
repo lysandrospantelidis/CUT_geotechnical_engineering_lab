@@ -391,14 +391,7 @@ def render_card(item: dict, button_label: str, mode: str):
         if mode == "web":
             app_url = item.get("url", "").strip()
             if app_url:
-                if st.button(button_label, key=f"open_web_{slugify(title)}", use_container_width=True):
-                    track_and_redirect(
-                        "open_program",
-                        app_url,
-                        program=slugify(title),
-                        program_title=title,
-                        category="web_app",
-                    )
+                st.link_button(button_label, app_url, use_container_width=True)
                 render_qr_block(title, app_url)
             else:
                 st.info("Web app link not provided.")
@@ -406,14 +399,7 @@ def render_card(item: dict, button_label: str, mode: str):
         elif mode == "desktop":
             exe_url = release_info["asset_url"] if release_info else ""
             if exe_url:
-                if st.button(button_label, key=f"download_exe_{slugify(title)}", use_container_width=True):
-                    track_and_redirect(
-                        "download_program",
-                        exe_url,
-                        program=slugify(title),
-                        program_title=title,
-                        category="desktop_app",
-                    )
+                st.link_button(button_label, exe_url, use_container_width=True)
                 render_qr_block(title, exe_url)
             else:
                 st.warning("No matching .exe found in GitHub Releases.")
@@ -423,14 +409,7 @@ def render_card(item: dict, button_label: str, mode: str):
             if release_date:
                 st.markdown(f"**Release date:** {release_date}")
             if release_info.get("release_html_url"):
-                if st.button("Open release page", key=f"release_page_{mode}_{slugify(title)}", use_container_width=True):
-                    track_and_redirect(
-                        "open_release_page",
-                        release_info["release_html_url"],
-                        program=slugify(title),
-                        program_title=title,
-                        category=mode,
-                    )
+                st.link_button("Open release page", release_info["release_html_url"], use_container_width=True)
 
         if note:
             st.markdown(f'<div class="mini-note">{note}</div>', unsafe_allow_html=True)
@@ -480,25 +459,11 @@ def render_doc_card(item: dict):
 
             with col1:
                 if manual_info.get("html_url"):
-                    if st.button("View manual online", key=f"view_manual_{slugify(title)}", use_container_width=True):
-                        track_and_redirect(
-                            "view_manual",
-                            manual_info["html_url"],
-                            program=slugify(title),
-                            program_title=title,
-                            category="manual",
-                        )
+                    st.link_button("View manual online", manual_info["html_url"], use_container_width=True)
 
             with col2:
                 if manual_info.get("download_url"):
-                    if st.button("Download manual", key=f"download_manual_{slugify(title)}", use_container_width=True):
-                        track_and_redirect(
-                            "download_manual",
-                            manual_info["download_url"],
-                            program=slugify(title),
-                            program_title=title,
-                            category="manual",
-                        )
+                    st.link_button("Download manual", manual_info["download_url"], use_container_width=True)
 
             if manual_info.get("html_url"):
                 render_qr_block(f"{title} manual", manual_info["html_url"])
@@ -540,25 +505,13 @@ def render_updates():
             label = f"{date} — {name}" if date else name
 
             if rel.get("html_url"):
-                if st.button(label, key=f"release_link_{slugify(name)}_{date}", use_container_width=True):
-                    track_and_redirect(
-                        "open_release_link",
-                        rel["html_url"],
-                        release_name=name,
-                        release_date=date,
-                        category="release_links",
-                    )
+                st.link_button(label, rel["html_url"], use_container_width=True)
     else:
         st.write("No public release links found.")
 
     if GITHUB_REPO_URL:
         st.markdown("### Repository")
-        if st.button("Open GitHub repository", key="open_github_repository", use_container_width=True):
-            track_and_redirect(
-                "open_repository",
-                GITHUB_REPO_URL,
-                category="repository",
-            )
+        st.link_button("Open GitHub repository", GITHUB_REPO_URL, use_container_width=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -890,24 +843,19 @@ https://cut-apps.streamlit.app/"""
         col1, col2, col3, col4, col5 = st.columns(5)
 
         with col1:
-            if st.button("WhatsApp", key="share_whatsapp", use_container_width=True):
-                track_and_redirect("share_platform", wa_url, channel="whatsapp")
+            st.link_button("WhatsApp", wa_url, use_container_width=True)
 
         with col2:
-            if st.button("Viber", key="share_viber", use_container_width=True):
-                track_and_redirect("share_platform", viber_url, channel="viber")
+            st.link_button("Viber", viber_url, use_container_width=True)
 
         with col3:
-            if st.button("Email", key="share_email", use_container_width=True):
-                track_and_redirect("share_platform", email_url, channel="email")
+            st.link_button("Email", email_url, use_container_width=True)
 
         with col4:
-            if st.button("LinkedIn", key="share_linkedin", use_container_width=True):
-                track_and_redirect("share_platform", share_links["LinkedIn"], channel="linkedin")
+            st.link_button("LinkedIn", share_links["LinkedIn"], use_container_width=True)
 
         with col5:
-            if st.button("Facebook", key="share_facebook", use_container_width=True):
-                track_and_redirect("share_platform", share_links["Facebook"], channel="facebook")
+            st.link_button("Facebook", share_links["Facebook"], use_container_width=True)
 
         st.markdown("#### or")
 
@@ -938,13 +886,7 @@ with tab7:
         label = item.get("label", "").strip()
         url = item.get("url", "").strip()
         if label and url:
-            if st.button(label, key=f"profile_link_{slugify(label)}", use_container_width=True):
-                track_and_redirect(
-                    "open_profile_link",
-                    url,
-                    label=label,
-                    category="profile",
-                )
+            st.link_button(label, url, use_container_width=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
 

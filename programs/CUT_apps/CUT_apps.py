@@ -1,5 +1,6 @@
 import json
 import re
+import time
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
@@ -8,6 +9,7 @@ from urllib.parse import quote
 
 import qrcode
 import streamlit as st
+import streamlit.components.v1 as components
 from urllib.request import Request, urlopen
 
 st.set_page_config(
@@ -15,6 +17,13 @@ st.set_page_config(
     page_icon="🏗️",
     layout="wide",
 )
+
+if "start_time" not in st.session_state:
+    st.session_state.start_time = time.time()
+
+if "app_open_tracked" not in st.session_state:
+    track_event("app_open", page="hub")
+    st.session_state.app_open_tracked = True
 
 # -------------------------------------------------
 # CONFIG
@@ -29,6 +38,60 @@ if not CONFIG_FILE.exists():
 with open(CONFIG_FILE, "r", encoding="utf-8") as f:
     cfg = json.load(f)
 
+# -------------------------------------------------
+# ANALYTICS HELPERS
+# -------------------------------------------------
+def track_event(event_name: str, **params):
+    payload = {"event_name": event_name, **params}
+    payload_json = json.dumps(payload)
+
+    components.html(
+        f'''
+        <script>
+        const payload = {payload_json};
+        if (typeof window.gtag !== "undefined") {{
+            const {{ event_name, ...event_params }} = payload;
+            window.gtag("event", event_name, event_params);
+        }}
+        </script>
+        ''',
+        height=0,
+    )
+
+
+def redirect_to(url: str):
+    safe_url = json.dumps(url)
+    components.html(
+        f'''
+        <script>
+        const targetUrl = {safe_url};
+        window.top.location.href = targetUrl;
+        </script>
+        ''',
+        height=0,
+    )
+
+
+def track_and_redirect(event_name: str, url: str, **params):
+    payload = {"event_name": event_name, "url": url, **params}
+    payload_json = json.dumps(payload)
+
+    components.html(
+        f'''
+        <script>
+        const payload = {payload_json};
+        const {{ event_name, url, ...event_params }} = payload;
+        if (typeof window.gtag !== "undefined") {{
+            window.gtag("event", event_name, event_params);
+        }}
+        setTimeout(function() {{
+            window.top.location.href = url;
+        }}, 150);
+        </script>
+        ''',
+        height=0,
+    )
+
 GITHUB_OWNER = cfg.get("github_owner", "").strip()
 GITHUB_REPO = cfg.get("github_repo_name", "").strip()
 GITHUB_BRANCH = cfg.get("github_branch", "main").strip()
@@ -42,6 +105,7 @@ SHARE_URL = cfg.get("share_url", "").strip()
 def get_str(key: str, default: str = "") -> str:
     val = cfg.get(key, default)
     return val if isinstance(val, str) else default
+
 
 def slugify(text: str) -> str:
     return (
@@ -326,7 +390,14 @@ def render_card(item: dict, button_label: str, mode: str):
         if mode == "web":
             app_url = item.get("url", "").strip()
             if app_url:
-                st.link_button(button_label, app_url, use_container_width=True)
+                if st.button(button_label, key=f"open_web_{slugify(title)}", use_container_width=True):
+                    track_and_redirect(
+                        "open_program",
+                        app_url,
+                        program=slugify(title),
+                        program_title=title,
+                        category="web_app",
+                    )
                 render_qr_block(title, app_url)
             else:
                 st.info("Web app link not provided.")
@@ -334,7 +405,14 @@ def render_card(item: dict, button_label: str, mode: str):
         elif mode == "desktop":
             exe_url = release_info["asset_url"] if release_info else ""
             if exe_url:
-                st.link_button(button_label, exe_url, use_container_width=True)
+                if st.button(button_label, key=f"download_exe_{slugify(title)}", use_container_width=True):
+                    track_and_redirect(
+                        "download_program",
+                        exe_url,
+                        program=slugify(title),
+                        program_title=title,
+                        category="desktop_app",
+                    )
                 render_qr_block(title, exe_url)
             else:
                 st.warning("No matching .exe found in GitHub Releases.")
@@ -344,7 +422,14 @@ def render_card(item: dict, button_label: str, mode: str):
             if release_date:
                 st.markdown(f"**Release date:** {release_date}")
             if release_info.get("release_html_url"):
-                st.link_button("Open release page", release_info["release_html_url"], use_container_width=True)
+                if st.button("Open release page", key=f"release_page_{mode}_{slugify(title)}", use_container_width=True):
+                    track_and_redirect(
+                        "open_release_page",
+                        release_info["release_html_url"],
+                        program=slugify(title),
+                        program_title=title,
+                        category=mode,
+                    )
 
         if note:
             st.markdown(f'<div class="mini-note">{note}</div>', unsafe_allow_html=True)
@@ -394,11 +479,25 @@ def render_doc_card(item: dict):
 
             with col1:
                 if manual_info.get("html_url"):
-                    st.link_button("View manual online", manual_info["html_url"], use_container_width=True)
+                    if st.button("View manual online", key=f"view_manual_{slugify(title)}", use_container_width=True):
+                        track_and_redirect(
+                            "view_manual",
+                            manual_info["html_url"],
+                            program=slugify(title),
+                            program_title=title,
+                            category="manual",
+                        )
 
             with col2:
                 if manual_info.get("download_url"):
-                    st.link_button("Download manual", manual_info["download_url"], use_container_width=True)
+                    if st.button("Download manual", key=f"download_manual_{slugify(title)}", use_container_width=True):
+                        track_and_redirect(
+                            "download_manual",
+                            manual_info["download_url"],
+                            program=slugify(title),
+                            program_title=title,
+                            category="manual",
+                        )
 
             if manual_info.get("html_url"):
                 render_qr_block(f"{title} manual", manual_info["html_url"])
@@ -440,13 +539,25 @@ def render_updates():
             label = f"{date} — {name}" if date else name
 
             if rel.get("html_url"):
-                st.link_button(label, rel["html_url"], use_container_width=True)
+                if st.button(label, key=f"release_link_{slugify(name)}_{date}", use_container_width=True):
+                    track_and_redirect(
+                        "open_release_link",
+                        rel["html_url"],
+                        release_name=name,
+                        release_date=date,
+                        category="release_links",
+                    )
     else:
         st.write("No public release links found.")
 
     if GITHUB_REPO_URL:
         st.markdown("### Repository")
-        st.link_button("Open GitHub repository", GITHUB_REPO_URL, use_container_width=True)
+        if st.button("Open GitHub repository", key="open_github_repository", use_container_width=True):
+            track_and_redirect(
+                "open_repository",
+                GITHUB_REPO_URL,
+                category="repository",
+            )
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -659,6 +770,10 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
 ])
 
 with tab1:
+    if "tab_web_apps_tracked" not in st.session_state:
+        track_event("view_tab", tab="web_applications")
+        st.session_state.tab_web_apps_tracked = True
+
     st.markdown(
         '<div class="section-intro">Interactive browser-based tools for immediate use on desktop, tablet, and phone, without local installation.</div>',
         unsafe_allow_html=True,
@@ -669,6 +784,10 @@ with tab1:
         render_card(item, "Open Web App", "web")
 
 with tab2:
+    if "tab_desktop_tracked" not in st.session_state:
+        track_event("view_tab", tab="desktop_programs")
+        st.session_state.tab_desktop_tracked = True
+
     st.markdown(
         '<div class="section-intro">Standalone Windows executables for offline and local desktop use.</div>',
         unsafe_allow_html=True,
@@ -678,6 +797,10 @@ with tab2:
         render_card(item, "Download .exe", "desktop")
 
 with tab3:
+    if "tab_manuals_tracked" not in st.session_state:
+        track_event("view_tab", tab="manuals")
+        st.session_state.tab_manuals_tracked = True
+
     st.markdown(
         '<div class="section-intro">Supporting manuals, explanatory material, and references for the software suite.</div>',
         unsafe_allow_html=True,
@@ -687,6 +810,10 @@ with tab3:
         render_doc_card(item)
 
 with tab4:
+    if "tab_releases_tracked" not in st.session_state:
+        track_event("view_tab", tab="release_links")
+        st.session_state.tab_releases_tracked = True
+
     st.markdown(
         '<div class="section-intro">Direct links to recent public software releases.</div>',
         unsafe_allow_html=True,
@@ -694,6 +821,10 @@ with tab4:
     render_updates()
 
 with tab5:
+    if "tab_about_tracked" not in st.session_state:
+        track_event("view_tab", tab="about_citation")
+        st.session_state.tab_about_tracked = True
+
     st.markdown(
         '<div class="section-intro">Institutional information, software citation guidance, and disclaimer.</div>',
         unsafe_allow_html=True,
@@ -729,6 +860,10 @@ with tab5:
         st.markdown("</div>", unsafe_allow_html=True)
 
 with tab6:
+    if "tab_share_tracked" not in st.session_state:
+        track_event("view_tab", tab="share")
+        st.session_state.tab_share_tracked = True
+
     st.markdown(
         '<div class="section-intro">Please consider sharing this platform with colleagues, students, researchers, and practicing engineers who may benefit from these tools. Wider sharing helps the software reach the academic and professional communities it was developed to support.</div>',
         unsafe_allow_html=True,
@@ -754,19 +889,24 @@ https://cut-apps.streamlit.app/"""
         col1, col2, col3, col4, col5 = st.columns(5)
 
         with col1:
-            st.link_button("WhatsApp", wa_url, use_container_width=True)
+            if st.button("WhatsApp", key="share_whatsapp", use_container_width=True):
+                track_and_redirect("share_platform", wa_url, channel="whatsapp")
 
         with col2:
-            st.link_button("Viber", viber_url, use_container_width=True)
+            if st.button("Viber", key="share_viber", use_container_width=True):
+                track_and_redirect("share_platform", viber_url, channel="viber")
 
         with col3:
-            st.link_button("Email", email_url, use_container_width=True)
+            if st.button("Email", key="share_email", use_container_width=True):
+                track_and_redirect("share_platform", email_url, channel="email")
 
         with col4:
-            st.link_button("LinkedIn", share_links["LinkedIn"], use_container_width=True)
+            if st.button("LinkedIn", key="share_linkedin", use_container_width=True):
+                track_and_redirect("share_platform", share_links["LinkedIn"], channel="linkedin")
 
         with col5:
-            st.link_button("Facebook", share_links["Facebook"], use_container_width=True)
+            if st.button("Facebook", key="share_facebook", use_container_width=True):
+                track_and_redirect("share_platform", share_links["Facebook"], channel="facebook")
 
         st.markdown("#### or")
 
@@ -781,6 +921,10 @@ https://cut-apps.streamlit.app/"""
     st.markdown("</div>", unsafe_allow_html=True)
     
 with tab7:
+    if "tab_profile_tracked" not in st.session_state:
+        track_event("view_tab", tab="profile")
+        st.session_state.tab_profile_tracked = True
+
     st.markdown(
         '<div class="section-intro">Academic profiles and external links.</div>',
         unsafe_allow_html=True,
@@ -793,11 +937,21 @@ with tab7:
         label = item.get("label", "").strip()
         url = item.get("url", "").strip()
         if label and url:
-            st.link_button(label, url, use_container_width=True)
+            if st.button(label, key=f"profile_link_{slugify(label)}", use_container_width=True):
+                track_and_redirect(
+                    "open_profile_link",
+                    url,
+                    label=label,
+                    category="profile",
+                )
 
     st.markdown("</div>", unsafe_allow_html=True)
 
 with tab8:
+    if "tab_contact_tracked" not in st.session_state:
+        track_event("view_tab", tab="contact")
+        st.session_state.tab_contact_tracked = True
+
     st.markdown(
         '<div class="section-intro">Contact information.</div>',
         unsafe_allow_html=True,

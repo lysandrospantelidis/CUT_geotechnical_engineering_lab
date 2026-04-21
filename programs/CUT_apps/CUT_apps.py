@@ -61,7 +61,7 @@ def get_tracking_meta(item: dict, fallback_category: str, fallback_type: str):
 
 
 def render_tracked_link_button(
-    label: str,
+    button_text: str,
     url: str,
     event_name: str,
     key_suffix: str,
@@ -74,7 +74,7 @@ def render_tracked_link_button(
 
     payload_json = json.dumps(params).replace("&", "&amp;").replace("'", "&#39;")
     safe_url = url.replace("&", "&amp;").replace('"', "&quot;")
-    safe_label = label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    safe_label = button_text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     target = "_blank" if new_tab else "_self"
     rel = "noopener noreferrer" if new_tab else ""
 

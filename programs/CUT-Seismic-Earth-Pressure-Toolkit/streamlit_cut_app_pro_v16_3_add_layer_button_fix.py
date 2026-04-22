@@ -1,5 +1,4 @@
 import math
-from io import BytesIO
 import base64
 from pathlib import Path
 
@@ -9,10 +8,11 @@ import streamlit as st
 from PIL import Image
 
 PROGRAM_NAME = "CUT Seismic Earth Pressure Toolkit"
-VERSION = "v15.2"
+VERSION = "v16.3"
 AUTHOR = "Dr Lysandros Pantelidis, Cyprus University of Technology"
 HOME_URL = "https://cut-apps.streamlit.app/"
 UNIFIED_WARNING = "Limit condition reached: wedge solution not admissible."
+EPS = 1e-5
 
 METHOD_COLORS = {
     "EN active": "#4C78A8",
@@ -66,6 +66,8 @@ def _fmt_auto(value, nr=False, na=False):
         return "NR"
     if value is None or (isinstance(value, float) and pd.isna(value)):
         return "—"
+    if isinstance(value, str):
+        return value
     try:
         v = float(value)
     except Exception:
@@ -75,12 +77,18 @@ def _fmt_auto(value, nr=False, na=False):
     return f"{v:.3f}"
 
 
+def _fmt_cell3(value, nr=False, na=False):
+    if isinstance(value, str):
+        return value
+    return _fmt_res3(value, nr=nr, na=na)
+
+
 def format_numeric_df(df: pd.DataFrame):
     out = df.copy()
     for col in out.columns:
         if col == "Method":
             continue
-        out[col] = out[col].map(lambda x: "N/A" if pd.isna(x) else _fmt_auto(x))
+        out[col] = out[col].map(lambda x: _fmt_auto(x))
     return out
 
 
@@ -88,13 +96,21 @@ def design_wall_friction_deg(delta_deg, gamma_phi):
     return math.degrees(math.atan(math.tan(math.radians(delta_deg)) / gamma_phi))
 
 
-def weighted_average(layers, key):
-    H = sum(layer["thk"] for layer in layers)
-    if H <= 0:
-        return 0.0
-    return sum(layer["thk"] * layer[key] for layer in layers) / H
+def derive_pren_qc_from_K(K_gamma, phi_deg, beta_deg, mode):
+    phi = math.radians(phi_deg)
+    cosb = math.cos(math.radians(beta_deg))
+    _require_positive("cos(beta)", cosb)
+    tanphi = math.tan(phi)
+    _require_positive("tan(phi)", tanphi)
+    K_q = K_gamma / cosb
+    if mode == "active":
+        K_c = (1.0 - K_gamma) / tanphi
+    else:
+        K_c = (K_gamma - 1.0) / tanphi
+    return K_q, K_c
 
 
+# ---------------- layer helpers ----------------
 def build_layers_from_df(df: pd.DataFrame):
     layers = []
     z0 = 0.0
@@ -149,34 +165,13 @@ def retained_side_u_total(z, H, layers, zwt, gamma_w, kh, inner_flow, include_dy
     return sv, u_h, u_d, u_h + u_d
 
 
+# ---------------- EN/AASHTO / prEN ----------------
 def pren_theta_eq(alphaH, sigma_v, u):
     if u <= 0.0:
         return math.atan(alphaH)
     eff = sigma_v - u
     _require_positive("(σv-u)", eff)
     return math.atan(alphaH * sigma_v / eff)
-
-
-def compute_gamma_star_theta_ewd(water_case, gamma_dry, gamma_sat, gamma_w, Hprime_base, kh, kv, mode):
-    sign = -1.0 if mode == "active" else 1.0
-    denom = 1.0 + sign * kv
-    if denom <= 0.0:
-        raise GeometryError("The denominator 1 ± kv must be positive for θ.")
-    if water_case == "E.5: Water table below wall":
-        gamma_star = gamma_dry
-        tan_theta = kh / denom
-        ews = ewd = 0.0
-    elif water_case == "E.6: Impervious soil below water table":
-        gamma_star = gamma_sat - gamma_w
-        tan_theta = (gamma_sat / (gamma_sat - gamma_w)) * (kh / denom)
-        ews = 0.5 * gamma_w * Hprime_base**2
-        ewd = 0.0
-    else:
-        gamma_star = gamma_sat - gamma_w
-        tan_theta = (gamma_dry / (gamma_sat - gamma_w)) * (kh / denom)
-        ews = 0.5 * gamma_w * Hprime_base**2
-        ewd = (7.0 / 12.0) * kh * gamma_w * Hprime_base**2
-    return gamma_star, math.atan(tan_theta), ews, ewd
 
 
 def en_active_coeffs_with_theta(phi_deg, beta_deg, alpha_deg, delta_deg, theta):
@@ -212,7 +207,7 @@ def en_passive_coeffs_with_theta(phi_deg, beta_deg, alpha_deg, theta):
         raise GeometryError(UNIFIED_WARNING)
     bracket = 1.0 - math.sqrt(rad)
     _require_positive("bracket", bracket)
-    K = num / (den0 * bracket**2)
+    K = num / (den0 * bracket ** 2)
     return {"theta_deg": math.degrees(theta), "K_gamma": K, "K_q": K, "K_c": K}
 
 
@@ -254,6 +249,7 @@ def pren_passive_coeffs(phi_deg, beta_deg, delta_deg, theta):
     return {"theta_deg": math.degrees(theta), "K_gamma": Kg, "K_q": Kg / math.cos(beta), "K_c": (Kg - 1) / math.tan(phi)}
 
 
+# ---------------- CUT ----------------
 def cut_theta_eq(alphaH, av, sigma_v, u):
     denom = 1.0 - av
     _require_positive("(1-a_v)", denom)
@@ -279,7 +275,7 @@ def cut_empirical_adjustment(phi_deg, c_val, gamma_val, beta_deg, phi_m_deg, mod
 
 
 def cut_lambda_a0_b1(phi_deg, c_val, sigma_v, u, theta, av, xi, xi1, xi2, mode):
-    c_val = max(c_val, 0.001)
+    c_val = max(c_val, EPS)
     phi = math.radians(phi_deg)
     sin_phi = math.sin(phi)
     tan_phi = math.tan(phi)
@@ -287,10 +283,14 @@ def cut_lambda_a0_b1(phi_deg, c_val, sigma_v, u, theta, av, xi, xi1, xi2, mode):
     _require_positive("(1-a_v)(σv-u)", denom)
     if mode == "active":
         lam = 1.0
-        A0 = ((1.0 - sin_phi) / (1.0 + sin_phi)) * (1.0 - xi * sin_phi + math.tan(theta) * tan_phi * (2.0 + xi * (1.0 - sin_phi)))
+        A0 = ((1.0 - sin_phi) / (1.0 + sin_phi)) * (
+            1.0 - xi * sin_phi + math.tan(theta) * tan_phi * (2.0 + xi * (1.0 - sin_phi))
+        )
         B1 = (2.0 * c_val / denom) * math.tan(math.pi / 4.0 - phi / 2.0)
     else:
-        A0 = (((1.0 + sin_phi) / (1.0 - sin_phi)) ** xi1) * (1.0 + xi * sin_phi + xi2 * math.tan(theta) * tan_phi * (2.0 + xi * (1.0 + sin_phi)))
+        A0 = (((1.0 + sin_phi) / (1.0 - sin_phi)) ** xi1) * (
+            1.0 + xi * sin_phi + xi2 * math.tan(theta) * tan_phi * (2.0 + xi * (1.0 + sin_phi))
+        )
         lam = 0.0 if A0 >= 1.0 else 1.0
         ratio = math.tan(math.pi / 4.0 + phi / 2.0) / math.tan(math.pi / 4.0 - phi / 2.0)
         B1 = (2.0 * lam - 1.0) * (2.0 * c_val / denom) * math.tan(math.pi / 4.0 - phi / 2.0) * (ratio ** xi1)
@@ -301,41 +301,49 @@ def cut_phi_m_from_parameters(phi_deg, c_val, sigma_v, u, theta, av, xi, xi1, xi
     phi = math.radians(phi_deg)
     tan_phi = math.tan(phi)
     lam, A0, B1 = cut_lambda_a0_b1(phi_deg, c_val, sigma_v, u, theta, av, xi, xi1, xi2, mode)
+
     if abs(B1) <= 1e-20 or not math.isfinite(B1):
         raise GeometryError("CUT: invalid B1.")
+
     e1 = (1.0 - A0) / B1
     denomB = (2.0 * lam - 1.0) * B1
     if abs(denomB) <= 1e-20:
         raise GeometryError("CUT: invalid denominator for e2.")
-    e2 = (1.0 + A0) / denomB + 2.0 * c_val / (((1.0 - av) * (sigma_v - u)) * denomB * tan_phi)
-    tan2 = tan_phi**2
-    a0 = 1.0 + (e2**2) * tan2
-    b0 = 1.0 - (2.0 * (2.0 * lam - 1.0) * e1 * e2 + e2**2) * tan2
-    c0 = (e1**2 + 2.0 * (2.0 * lam - 1.0) * e1 * e2) * tan2
-    d0 = -(e1**2) * tan2
-    D0 = b0**2 - 3.0 * a0 * c0
-    D1 = 2.0 * b0**3 - 9.0 * a0 * b0 * c0 + 27.0 * (a0**2) * d0
-    disc = complex(D1**2 - 4.0 * (D0**3), 0.0)
-    inside = 0.5 * (complex(D1, 0.0) - disc ** 0.5)
-    C0 = inside ** (1.0 / 3.0) if abs(inside) > 1e-30 else complex(0.0, 0.0)
+
+    denominator_term = max((1.0 - av) * (sigma_v - u) * (2.0 * lam - 1.0) * B1 * tan_phi, 1e-20)
+    e2 = (1.0 + A0) / denomB + 2.0 * c_val / denominator_term
+
+    tan2 = tan_phi ** 2
+    a0 = 1.0 + (e2 ** 2) * tan2
+    b0 = 1.0 - (2.0 * (2.0 * lam - 1.0) * e1 * e2 + e2 ** 2) * tan2
+    c0 = (e1 ** 2 + 2.0 * (2.0 * lam - 1.0) * e1 * e2) * tan2
+    d0 = -(e1 ** 2) * tan2
+
+    D0 = b0 ** 2 - 3.0 * a0 * c0
+    D1 = 2.0 * b0 ** 3 - 9.0 * a0 * b0 * c0 + 27.0 * (a0 ** 2) * d0
+
+    inside_sqrt = complex(D1 ** 2 - 4.0 * (D0 ** 3), 0.0)
+    inside = 0.5 * (complex(D1, 0.0) - inside_sqrt ** 0.5)
+    C0 = inside ** (1.0 / 3.0)
     if abs(C0) <= 1e-30:
         raise GeometryError("CUT: invalid cubic solution.")
-    omega = [complex(1.0, 0.0), complex(-0.5, math.sqrt(3.0) / 2.0), complex(-0.5, -math.sqrt(3.0) / 2.0)]
-    roots = []
-    sgn = 2.0 * lam - 1.0
-    for w in omega:
-        xk = -sgn * (b0 + D0 / (C0 * w) + C0 * w) / (3.0 * a0)
-        if abs(xk.imag) < 1e-8:
-            xr = xk.real
-            if -1.0 <= xr <= 1.0:
-                phi_k = math.degrees(math.asin(xr))
-                if 0.0 <= phi_k <= phi_deg + 1e-8:
-                    roots.append((abs(phi_deg - phi_k), phi_k, xr))
-    if not roots:
-        raise GeometryError("CUT: no physically admissible root.")
-    roots.sort(key=lambda t: t[0])
-    phi_m = roots[0][1]
-    return {"lambda": lam, "A0": A0, "B1": B1, "phi_m_deg": phi_m}
+
+    zeta = complex(-0.5, math.sqrt(3.0) / 2.0)
+    zlam = zeta ** lam
+    x = -(2.0 * lam - 1.0) * (b0 + D0 / (C0 * zlam) + C0 * zlam) / (3.0 * a0)
+
+    x_real = x.real
+    if x_real > 1.0:
+        x_real = 1.0
+    elif x_real < -1.0:
+        x_real = -1.0
+    phi_m = math.degrees(math.asin(x_real))
+
+    return {
+        "lambda": lam, "A0": A0, "B1": B1, "e1": e1, "e2": e2,
+        "a0": a0, "b0": b0, "c0": c0, "d0": d0, "D0": D0, "D1": D1, "C0": C0,
+        "phi_m_deg": phi_m
+    }
 
 
 def cut_kxe_from_phi_m(phi_m_deg, phi_deg, c_val, sigma_v, u, av, lam):
@@ -364,6 +372,23 @@ def positive_resultant_from_arrays(zvals, sigma_vals):
     return P, ybar_base
 
 
+def interpolate_piecewise(xvals, yvals, x):
+    if not xvals:
+        return 0.0
+    if x <= xvals[0]:
+        return yvals[0]
+    if x >= xvals[-1]:
+        return yvals[-1]
+    for i in range(len(xvals) - 1):
+        x0, x1 = xvals[i], xvals[i + 1]
+        if x0 <= x <= x1:
+            if abs(x1 - x0) < 1e-12:
+                return yvals[i]
+            t = (x - x0) / (x1 - x0)
+            return yvals[i] + t * (yvals[i + 1] - yvals[i])
+    return yvals[-1]
+
+
 def pointwise_method_profile(method, mode, layers, H, alpha_deg, beta_deg, delta_deg, alphaH, kv, gamma_w, zwt, q,
                              c_mode_on, kh=0.0, inner_flow="impervious", include_retained_dynamic=True, npts=401):
     zvals = [H * i / (npts - 1) for i in range(npts)]
@@ -378,27 +403,35 @@ def pointwise_method_profile(method, mode, layers, H, alpha_deg, beta_deg, delta
     udvals = []
     svvals = []
     for z in zvals:
-        layer = layer_at_z(layers, z if z > 1e-9 else 1e-9)
+        layer = layer_at_z(layers, z if z > EPS else EPS)
         sv, u_h = sigma_v_u_layered(z, layers, zwt, gamma_w)
         _, _, u_d, _ = retained_side_u_total(z, H, layers, zwt, gamma_w, kh, inner_flow, include_dynamic=include_retained_dynamic)
         theta = pren_theta_eq(alphaH, sv, u_h)
         if method == "EN":
             if mode == "active":
                 coeff = en_active_coeffs_with_theta(layer["phi"], beta_deg, alpha_deg, delta_deg, theta)
-                cterm_i = -coeff["K_c"] * layer["c"] if c_mode_on else 0.0
                 sigma_eff = coeff["K_gamma"] * (1.0 - kv) * (sv - u_h)
             else:
                 coeff = en_passive_coeffs_with_theta(layer["phi"], beta_deg, alpha_deg, theta)
-                cterm_i = coeff["K_c"] * layer["c"] if c_mode_on else 0.0
                 sigma_eff = coeff["K_gamma"] * (1.0 + kv) * (sv - u_h)
         elif method == "AASHTO":
             if mode != "active":
                 raise GeometryError("AASHTO passive is not defined.")
             coeff = en_active_coeffs_with_theta(layer["phi"], beta_deg, alpha_deg, delta_deg, theta)
-            cterm_i = -coeff["K_c"] * layer["c"] if c_mode_on else 0.0
             sigma_eff = coeff["K_gamma"] * (1.0 - kv) * (sv - u_h)
         else:
             raise ValueError("Unknown method")
+
+        if c_mode_on:
+            K_q_use, K_c_use = derive_pren_qc_from_K(coeff["K_gamma"], layer["phi"], beta_deg, mode)
+        else:
+            K_q_use, K_c_use = coeff["K_q"], coeff["K_c"]
+
+        coeff = {**coeff, "K_q": K_q_use, "K_c": K_c_use}
+        if mode == "active":
+            cterm_i = -coeff["K_c"] * layer["c"] if c_mode_on else 0.0
+        else:
+            cterm_i = coeff["K_c"] * layer["c"] if c_mode_on else 0.0
         qterm_i = coeff["K_q"] * q
         s = sigma_eff + qterm_i + cterm_i + u_h + u_d
         sigma.append(s)
@@ -413,9 +446,8 @@ def pointwise_method_profile(method, mode, layers, H, alpha_deg, beta_deg, delta
         svvals.append(sv)
     P, ybar = positive_resultant_from_arrays(zvals, sigma)
     return {
-        "z": zvals, "sigma": sigma, "P": P, "ybar_base": ybar, "theta_deg": theta_vals,
-        "K_gamma": Kg, "K_q": Kq, "K_c": Kc, "qterm": qterm, "cterm": cterm,
-        "u": uvals, "ud": udvals, "sv": svvals,
+        "z": zvals, "sigma": sigma, "P": P, "ybar_base": ybar, "theta_deg": theta_vals, "K_gamma": Kg, "K_q": Kq, "K_c": Kc,
+        "qterm": qterm, "cterm": cterm, "u": uvals, "ud": udvals, "sv": svvals,
         "base_K_gamma": Kg[-1], "base_K_q": Kq[-1], "base_K_c": Kc[-1], "base_theta_deg": theta_vals[-1],
         "top_sigma": sigma[0], "base_sigma": sigma[-1]
     }
@@ -434,7 +466,7 @@ def pren_profile(mode, layers, H, beta_deg, delta_deg, alphaH, gamma_w, zwt, q, 
     udvals = []
     svvals = []
     for z in zvals:
-        layer = layer_at_z(layers, z if z > 1e-9 else 1e-9)
+        layer = layer_at_z(layers, z if z > EPS else EPS)
         sv, u_h = sigma_v_u_layered(z, layers, zwt, gamma_w)
         _, _, u_d, _ = retained_side_u_total(z, H, layers, zwt, gamma_w, kh, inner_flow, include_dynamic=include_retained_dynamic)
         theta = pren_theta_eq(alphaH, sv, u_h)
@@ -458,8 +490,8 @@ def pren_profile(mode, layers, H, beta_deg, delta_deg, alphaH, gamma_w, zwt, q, 
         svvals.append(sv)
     P, ybar = positive_resultant_from_arrays(zvals, sigma)
     return {
-        "z": zvals, "sigma": sigma, "P": P, "ybar_base": ybar, "theta_deg": theta_vals,
-        "K_gamma": Kg, "K_q": Kq, "K_c": Kc, "qterm": qterm, "cterm": cterm, "u": uvals, "ud": udvals, "sv": svvals,
+        "z": zvals, "sigma": sigma, "P": P, "ybar_base": ybar, "theta_deg": theta_vals, "K_gamma": Kg, "K_q": Kq, "K_c": Kc,
+        "qterm": qterm, "cterm": cterm, "u": uvals, "ud": udvals, "sv": svvals,
         "base_K_gamma": Kg[-1], "base_K_q": Kq[-1], "base_K_c": Kc[-1], "base_theta_deg": theta_vals[-1],
         "top_sigma": sigma[0], "base_sigma": sigma[-1]
     }
@@ -469,6 +501,9 @@ def cut_profile(mode, layers, H, beta_deg, alphaH, av, gamma_w, zwt, q,
                 kh=0.0, inner_flow="impervious", include_retained_dynamic=True, npts=401):
     zvals = [H * i / (npts - 1) for i in range(npts)]
     sigma = []
+    sigma_raw = []
+    sigma_res = []
+    tension_flags = []
     theta_vals = []
     Kg = []
     Kq = []
@@ -481,20 +516,31 @@ def cut_profile(mode, layers, H, beta_deg, alphaH, av, gamma_w, zwt, q,
     phim_vals = []
     cm_vals = []
     xi, xi1, xi2 = cut_failure_xi_set()
+
     for z in zvals:
-        layer = layer_at_z(layers, z if z > 1e-9 else 1e-9)
-        c0 = max(layer["c"], 0.001)
-        sv, u_h = sigma_v_u_layered(z, layers, zwt, gamma_w)
-        _, _, u_d, _ = retained_side_u_total(z, H, layers, zwt, gamma_w, kh, inner_flow, include_dynamic=include_retained_dynamic)
+        z_eval = max(z, EPS)
+        layer = layer_at_z(layers, z_eval)
+        c0 = max(layer["c"], EPS)
+
+        sv, u_h = sigma_v_u_layered(z_eval, layers, zwt, gamma_w)
+        _, _, u_d, _ = retained_side_u_total(z_eval, H, layers, zwt, gamma_w, kh, inner_flow, include_dynamic=include_retained_dynamic)
+
         try:
-            phi_adj, c_adj, _, dsig_beta = cut_empirical_adjustment(layer["phi"], c0, layer["gd"], beta_deg, 0.0, mode, z=z)
+            phi_adj, c_adj, _, dsig_beta = cut_empirical_adjustment(layer["phi"], c0, layer["gd"], beta_deg, 0.0, mode, z=z_eval)
             sigma_v_adj = sv + dsig_beta
             theta_adj = cut_theta_eq(alphaH, av, sigma_v_adj, u_h)
             phim = cut_phi_m_from_parameters(phi_adj, c_adj, sigma_v_adj, u_h, theta_adj, av, xi, xi1, xi2, mode)
             KXE, c_m, sigma_xe = cut_kxe_from_phi_m(phim["phi_m_deg"], phi_adj, c_adj, sigma_v_adj, u_h, av, phim["lambda"])
             qterm_i = KXE * q
-            sigma_total = sigma_xe + qterm_i + u_d
-            sigma.append(sigma_total)
+            sigma_total_raw = sigma_xe + qterm_i + u_d
+            is_tension = sigma_total_raw < 0.0
+            sigma_total_plot = float("nan") if is_tension else sigma_total_raw
+            sigma_total_res = 0.0 if is_tension else sigma_total_raw
+
+            sigma.append(sigma_total_plot)
+            sigma_raw.append(sigma_total_raw)
+            sigma_res.append(sigma_total_res)
+            tension_flags.append(is_tension)
             theta_vals.append(math.degrees(theta_adj))
             Kg.append(KXE)
             Kq.append(KXE)
@@ -508,6 +554,9 @@ def cut_profile(mode, layers, H, beta_deg, alphaH, av, gamma_w, zwt, q,
             cm_vals.append(c_m)
         except Exception:
             sigma.append(0.0)
+            sigma_raw.append(0.0)
+            sigma_res.append(0.0)
+            tension_flags.append(False)
             theta_vals.append(0.0)
             Kg.append(0.0)
             Kq.append(0.0)
@@ -519,15 +568,17 @@ def cut_profile(mode, layers, H, beta_deg, alphaH, av, gamma_w, zwt, q,
             svvals.append(sv)
             phim_vals.append(0.0)
             cm_vals.append(0.0)
-    P, ybar = positive_resultant_from_arrays(zvals, sigma)
+
+    P, ybar = positive_resultant_from_arrays(zvals, sigma_res)
     return {
-        "z": zvals, "sigma": sigma, "P": P, "ybar_base": ybar, "theta_deg": theta_vals,
+        "z": zvals, "sigma": sigma, "sigma_raw": sigma_raw, "sigma_resultant": sigma_res, "tension": tension_flags,
+        "P": P, "ybar_base": ybar, "theta_deg": theta_vals,
         "K_gamma": Kg, "K_q": Kq, "K_c": Kc, "qterm": qterm, "cterm": cterm,
         "u": uvals, "ud": udvals, "sv": svvals,
         "phi_m_deg": phim_vals, "c_m": cm_vals,
         "base_K_gamma": Kg[-1], "base_K_q": Kq[-1], "base_K_c": Kc[-1], "base_theta_deg": theta_vals[-1],
         "base_phi_m_deg": phim_vals[-1], "base_c_m": cm_vals[-1],
-        "top_sigma": sigma[0], "base_sigma": sigma[-1]
+        "top_sigma": sigma_raw[0], "base_sigma": sigma_raw[-1]
     }
 
 
@@ -538,6 +589,116 @@ def wall_x_at_depth(H, alpha_deg, z_from_surface):
     return xb * (z_from_surface / H)
 
 
+def _dbg_num(v):
+    if v is None:
+        return "None"
+    try:
+        if isinstance(v, complex):
+            return f"{v.real:.12g}{v.imag:+.12g}j"
+        return f"{float(v):.12g}"
+    except Exception:
+        return str(v)
+
+
+def _debug_append(lines, label, value):
+    lines.append(f"{label} = {_dbg_num(value)}")
+
+
+def build_cut_trace_for_z_mode(zq, mode, layers, H, beta_deg, alphaH, av, gamma_w, zwt, q, inner_flow, retained_water_mode):
+    lines = []
+    zq = max(0.0, min(H, float(zq)))
+    z_eval = max(zq, EPS)
+    layer = layer_at_z(layers, z_eval)
+    c0_input = max(layer["c"], EPS)
+    sv, u_h = sigma_v_u_layered(z_eval, layers, zwt, gamma_w)
+    _, _, u_d, _ = retained_side_u_total(z_eval, H, layers, zwt, gamma_w, alphaH, inner_flow, include_dynamic=(retained_water_mode == "hydrodynamic"))
+
+    lines.append(f"CUT {mode.upper()} at z = {_dbg_num(zq)} m")
+    lines.append("")
+    lines.append("1. Input data at this depth")
+    _debug_append(lines, "z", zq)
+    _debug_append(lines, "z_eval used by CUT", z_eval)
+    _debug_append(lines, "Layer.phi", layer["phi"])
+    _debug_append(lines, "Layer.c", layer["c"])
+    _debug_append(lines, "Layer.gd", layer["gd"])
+    _debug_append(lines, "Layer.gs", layer["gs"])
+    _debug_append(lines, "alphaH = kh", alphaH)
+    _debug_append(lines, "a_v = kv", av)
+    _debug_append(lines, "beta", beta_deg)
+    _debug_append(lines, "q", q)
+    lines.append("")
+    lines.append("2. Vertical stress and pore pressures")
+    _debug_append(lines, "sigma_v", sv)
+    _debug_append(lines, "u_h", u_h)
+    _debug_append(lines, "u_d", u_d)
+    _debug_append(lines, "sigma_v - u_h", sv - u_h)
+    lines.append("")
+    lines.append("3. Internal cohesion floor used by CUT")
+    _debug_append(lines, "c0 = max(c, EPS)", c0_input)
+    lines.append("")
+    try:
+        phi_adj, c_adj, gamma_adj, dsig_beta = cut_empirical_adjustment(layer["phi"], c0_input, layer["gd"], beta_deg, 0.0, mode, z=z_eval)
+        lines.append("4. Empirical backslope correction (applied only through beta)")
+        _debug_append(lines, "phi_adj", phi_adj)
+        _debug_append(lines, "c_adj", c_adj)
+        _debug_append(lines, "gamma_adj", gamma_adj)
+        _debug_append(lines, "Delta sigma_beta", dsig_beta)
+        lines.append("")
+        sigma_v_adj = sv + dsig_beta
+        theta_adj = cut_theta_eq(alphaH, av, sigma_v_adj, u_h)
+        lines.append("5. Adjusted vertical stress and seismic angle")
+        _debug_append(lines, "sigma_v_adj = sigma_v + Delta sigma_beta", sigma_v_adj)
+        _debug_append(lines, "theta_eq (deg)", math.degrees(theta_adj))
+        lines.append("")
+        xi, xi1, xi2 = cut_failure_xi_set()
+        lines.append("6. Failure-state constants")
+        _debug_append(lines, "xi", xi)
+        _debug_append(lines, "xi1", xi1)
+        _debug_append(lines, "xi2", xi2)
+        lines.append("")
+        lam, A0, B1 = cut_lambda_a0_b1(phi_adj, c_adj, sigma_v_adj, u_h, theta_adj, av, xi, xi1, xi2, mode)
+        lines.append("7. Compute lambda, A0, B1")
+        if mode == "active":
+            lines.append("lambda criterion: active state -> lambda = 1.0 by definition")
+        else:
+            lines.append("lambda criterion: passive state -> lambda = 0 if A0 >= 1, else lambda = 1")
+        _debug_append(lines, "lambda", lam)
+        _debug_append(lines, "A0", A0)
+        _debug_append(lines, "B1", B1)
+        lines.append("")
+        phim = cut_phi_m_from_parameters(phi_adj, c_adj, sigma_v_adj, u_h, theta_adj, av, xi, xi1, xi2, mode)
+        lines.append("8. Cubic-solution intermediates for phi_m")
+        _debug_append(lines, "e1", phim["e1"])
+        _debug_append(lines, "e2", phim["e2"])
+        _debug_append(lines, "a0", phim["a0"])
+        _debug_append(lines, "b0", phim["b0"])
+        _debug_append(lines, "c0_cubic", phim["c0"])
+        _debug_append(lines, "d0", phim["d0"])
+        _debug_append(lines, "D0", phim["D0"])
+        _debug_append(lines, "D1", phim["D1"])
+        _debug_append(lines, "C0", phim["C0"])
+        lines.append("zeta = -1/2 + sqrt(3)/2 * i")
+        _debug_append(lines, "phi_m (deg)", phim["phi_m_deg"])
+        lines.append("")
+        KXE, c_m, sigma_xe = cut_kxe_from_phi_m(phim["phi_m_deg"], phi_adj, c_adj, sigma_v_adj, u_h, av, phim["lambda"])
+        qterm_i = KXE * q
+        sigma_total = sigma_xe + qterm_i + u_d
+        lines.append("9. Final CUT quantities")
+        _debug_append(lines, "K_XE", KXE)
+        _debug_append(lines, "c_m", c_m)
+        _debug_append(lines, "sigma_xe", sigma_xe)
+        _debug_append(lines, "K_XE * q", qterm_i)
+        _debug_append(lines, "final sigma_raw = sigma_xe + K_XE*q + u_d", sigma_total)
+        if sigma_total < 0.0:
+            lines.append("final status = TENSION -> rejected (not plotted, not included in resultant)")
+        else:
+            _debug_append(lines, "final sigma accepted", sigma_total)
+    except Exception as e:
+        lines.append(f"ERROR: {e}")
+    return "\n".join(lines)
+
+
+# ---------------- UI helpers ----------------
 def plot_geometry(H, alpha, beta, zwt, layers):
     fig, ax = plt.subplots(figsize=(9, 5.5))
     xb = H * math.tan(math.radians(alpha))
@@ -581,6 +742,53 @@ def plot_geometry(H, alpha, beta, zwt, layers):
     return fig
 
 
+def load_logo():
+    candidates = [Path("/mnt/data/logo.png"), Path(__file__).with_name("logo.png")]
+    for path in candidates:
+        if path.exists():
+            return Image.open(path)
+    return None
+
+
+def load_home_icon():
+    candidates = [Path("/mnt/data/home.png"), Path(__file__).with_name("home.png")]
+    for path in candidates:
+        if path.exists():
+            return path
+    return None
+
+
+def build_cutapps_card(home_icon_path):
+    if home_icon_path is None or not Path(home_icon_path).exists():
+        return f"""
+        <a href="{HOME_URL}" target="_blank" style="display:block;text-align:center;padding:16px;border:1px solid rgba(120,120,120,0.35);border-radius:16px;text-decoration:none;font-weight:700;color:inherit;margin:4px 0 14px 0;background:rgba(255,255,255,0.65);">CUT Apps</a>
+        """
+    mime = "image/png"
+    img_b64 = base64.b64encode(Path(home_icon_path).read_bytes()).decode("ascii")
+    return f"""
+    <a href="{HOME_URL}" target="_blank" style="display:block;padding:12px;border:1px solid rgba(120,120,120,0.28);border-radius:18px;text-decoration:none;color:inherit;margin:4px 0 14px 0;background:rgba(255,255,255,0.70);box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+        <img src="data:{mime};base64,{img_b64}" style="width:100%; display:block; border-radius:14px;" />
+    </a>
+    """
+
+
+def inject_sidebar_css():
+    st.markdown(
+        """
+        <style>
+        [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2,
+        [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 { margin-top: 0.35rem; margin-bottom: 0.45rem; }
+        [data-testid="stSidebar"] .stExpander { border-radius: 14px; overflow: hidden; }
+        [data-testid="stSidebar"] .stButton > button,
+        [data-testid="stSidebar"] .stDownloadButton > button { width: 100%; border-radius: 12px; min-height: 2.8rem; }
+        [data-testid="stSidebar"] .cutapps-note { font-size: 0.92rem; line-height: 1.35; opacity: 0.9; }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ---------------- result builders ----------------
 def build_results(inputs, layers):
     H = sum(layer["thk"] for layer in layers)
     alpha = inputs["alpha"]
@@ -596,6 +804,7 @@ def build_results(inputs, layers):
     inner_flow = inputs["inner_flow"]
     retained_water_mode = inputs["water_action_mode"]
     allow_qc_to_en_aashto = inputs["allow_qc_to_en_aashto"]
+
     kv = -kv_abs if inputs["kv_negative"] else kv_abs
     delta_d = design_wall_friction_deg(delta, gamma_phi)
 
@@ -610,53 +819,54 @@ def build_results(inputs, layers):
     aashto_use_c = allow_qc_to_en_aashto
 
     warnings = []
+    ena_nr = enp_nr = prena_nr = prenp_nr = aask_nr = False
 
     try:
         ena_prof = pointwise_method_profile("EN", "active", layers, H, alpha, beta, delta_d, kh, en_kv, gamma_w, zwt, en_q,
-                                           en_use_c, kh=kh, inner_flow=inner_flow,
-                                           include_retained_dynamic=(retained_water_mode == "hydrodynamic"))
+                                            en_use_c, kh=kh, inner_flow=inner_flow,
+                                            include_retained_dynamic=(retained_water_mode == "hydrodynamic"))
         ena = {"K": ena_prof["base_K_gamma"], "theta_deg": ena_prof["base_theta_deg"], "equation": "pointwise"}
     except Exception as e:
         ena_prof, ena = {"z": [], "sigma": []}, None
+        ena_nr = str(e) == UNIFIED_WARNING
         warnings.append(f"EN active: {e}")
 
     try:
         enp_prof = pointwise_method_profile("EN", "passive", layers, H, alpha, beta, delta_d, kh, en_kv, gamma_w, zwt, en_q,
-                                           en_use_c, kh=kh, inner_flow=inner_flow,
-                                           include_retained_dynamic=(retained_water_mode == "hydrodynamic"))
+                                            en_use_c, kh=kh, inner_flow=inner_flow,
+                                            include_retained_dynamic=(retained_water_mode == "hydrodynamic"))
         enp = {"K": enp_prof["base_K_gamma"], "theta_deg": enp_prof["base_theta_deg"], "equation": "pointwise"}
     except Exception as e:
         enp_prof, enp = {"z": [], "sigma": []}, None
+        enp_nr = str(e) == UNIFIED_WARNING
         warnings.append(f"EN passive: {e}")
 
     try:
         prena = pren_profile("active", layers, H, beta, delta, pren_alphaH, gamma_w, zwt, pren_q, pren_c,
-                             kh=kh, inner_flow=inner_flow,
-                             include_retained_dynamic=(retained_water_mode == "hydrodynamic"))
+                             kh=kh, inner_flow=inner_flow, include_retained_dynamic=(retained_water_mode == "hydrodynamic"))
     except Exception as e:
         prena = None
+        prena_nr = str(e) == UNIFIED_WARNING
         warnings.append(f"prEN active: {e}")
 
     try:
         prenp = pren_profile("passive", layers, H, beta, delta, pren_alphaH, gamma_w, zwt, pren_q, pren_c,
-                             kh=kh, inner_flow=inner_flow,
-                             include_retained_dynamic=(retained_water_mode == "hydrodynamic"))
+                             kh=kh, inner_flow=inner_flow, include_retained_dynamic=(retained_water_mode == "hydrodynamic"))
     except Exception as e:
         prenp = None
+        prenp_nr = str(e) == UNIFIED_WARNING
         warnings.append(f"prEN passive: {e}")
 
     try:
         cuta = cut_profile("active", layers, H, beta, kh, en_kv, gamma_w, zwt, q,
-                           kh=kh, inner_flow=inner_flow,
-                           include_retained_dynamic=(retained_water_mode == "hydrodynamic"))
+                           kh=kh, inner_flow=inner_flow, include_retained_dynamic=(retained_water_mode == "hydrodynamic"))
     except Exception as e:
         cuta = None
         warnings.append(f"CUT active: {e}")
 
     try:
         cutp = cut_profile("passive", layers, H, beta, kh, en_kv, gamma_w, zwt, q,
-                           kh=kh, inner_flow=inner_flow,
-                           include_retained_dynamic=(retained_water_mode == "hydrodynamic"))
+                           kh=kh, inner_flow=inner_flow, include_retained_dynamic=(retained_water_mode == "hydrodynamic"))
     except Exception as e:
         cutp = None
         warnings.append(f"CUT passive: {e}")
@@ -669,17 +879,18 @@ def build_results(inputs, layers):
         aask = {"K": aashto_prof["base_K_gamma"], "theta_deg": aashto_prof["base_theta_deg"]}
     except Exception as e:
         aashto_prof, aask = None, None
+        aask_nr = str(e) == UNIFIED_WARNING
         warnings.append(f"AASHTO active: {e}")
 
     summary_rows = [
-        {"Method": "EN 1998-5", "Active resultant": ena_prof.get("P") if ena_prof else None, "Active line above base": ena_prof.get("ybar_base") if ena_prof else None,
-         "Passive resultant": enp_prof.get("P") if enp_prof else None, "Passive line above base": enp_prof.get("ybar_base") if enp_prof else None},
-        {"Method": "prEN 1998-5", "Active resultant": prena.get("P") if prena else None, "Active line above base": prena.get("ybar_base") if prena else None,
-         "Passive resultant": prenp.get("P") if prenp else None, "Passive line above base": prenp.get("ybar_base") if prenp else None},
-        {"Method": "AASHTO", "Active resultant": aashto_prof.get("P") if aashto_prof else None, "Active line above base": aashto_prof.get("ybar_base") if aashto_prof else None,
-         "Passive resultant": None, "Passive line above base": None},
         {"Method": "CUT", "Active resultant": cuta.get("P") if cuta else None, "Active line above base": cuta.get("ybar_base") if cuta else None,
          "Passive resultant": cutp.get("P") if cutp else None, "Passive line above base": cutp.get("ybar_base") if cutp else None},
+        {"Method": "AASHTO", "Active resultant": aashto_prof.get("P") if aashto_prof else None, "Active line above base": aashto_prof.get("ybar_base") if aashto_prof else None,
+         "Passive resultant": None, "Passive line above base": None},
+        {"Method": "EN1998-5", "Active resultant": ena_prof.get("P") if ena_prof else None, "Active line above base": ena_prof.get("ybar_base") if ena_prof else None,
+         "Passive resultant": enp_prof.get("P") if enp_prof else None, "Passive line above base": enp_prof.get("ybar_base") if enp_prof else None},
+        {"Method": "prEN1998-5", "Active resultant": prena.get("P") if prena else None, "Active line above base": prena.get("ybar_base") if prena else None,
+         "Passive resultant": prenp.get("P") if prenp else None, "Passive line above base": prenp.get("ybar_base") if prenp else None},
     ]
     summary_df = pd.DataFrame(summary_rows)
 
@@ -689,6 +900,7 @@ def build_results(inputs, layers):
         "coeffs": {"ena": ena, "enp": enp, "aask": aask},
         "summary_df": summary_df,
         "warnings": warnings,
+        "flags": {"ena_nr": ena_nr, "enp_nr": enp_nr, "prena_nr": prena_nr, "prenp_nr": prenp_nr, "aask_nr": aask_nr},
     }
 
 
@@ -706,6 +918,7 @@ def point_table_at_z(zq, H, layers, inputs, results):
     retained_water_mode = inputs["water_action_mode"]
     allow_qc_to_en_aashto = inputs["allow_qc_to_en_aashto"]
     aashto_factor = inputs["aashto_factor"]
+
     kv = -kv_abs if inputs["kv_negative"] else kv_abs
     delta_d = design_wall_friction_deg(delta, gamma_phi)
     en_kv = kv
@@ -715,8 +928,10 @@ def point_table_at_z(zq, H, layers, inputs, results):
     aashto_q = q if allow_qc_to_en_aashto else 0.0
     en_use_c = allow_qc_to_en_aashto
     aashto_use_c = allow_qc_to_en_aashto
-    zq = max(0.0, min(H, float(zq)))
-    layer = layer_at_z(layers, max(zq, 1e-9))
+    pren_use_c = True
+    pren_alphaH = kh
+
+    zq = max(EPS, min(H, float(zq)))
     svq_h, uq_h = sigma_v_u_layered(zq, layers, zwt, gamma_w)
     _, _, uq_d, _ = retained_side_u_total(zq, H, layers, zwt, gamma_w, kh, inner_flow, include_dynamic=(retained_water_mode == "hydrodynamic"))
     effq = max(0.0, svq_h - uq_h)
@@ -736,72 +951,106 @@ def point_table_at_z(zq, H, layers, inputs, results):
             "Kc": kc_val,
         })
 
+    # order requested
+    cuta = results["profiles"].get("cuta")
+    if cuta is not None:
+        cut_sigma_raw = interpolate_piecewise(cuta["z"], cuta["sigma_raw"], zq)
+        cut_u = interpolate_piecewise(cuta["z"], cuta["u"], zq)
+        cut_ud = interpolate_piecewise(cuta["z"], cuta["ud"], zq)
+        cut_qterm = interpolate_piecewise(cuta["z"], cuta["qterm"], zq)
+        cut_kg = interpolate_piecewise(cuta["z"], cuta["K_gamma"], zq)
+        cut_kq = interpolate_piecewise(cuta["z"], cuta["K_q"], zq)
+        cut_sigma_eff = cut_sigma_raw - cut_qterm - cut_u - cut_ud
+        if cut_sigma_raw < 0.0:
+            add_row("CUT active", "Tension", cut_u, cut_ud, cut_qterm, 0.0, "Tension", cut_kg, cut_kq, 0.0)
+        else:
+            add_row("CUT active", cut_sigma_eff, cut_u, cut_ud, cut_qterm, 0.0, cut_sigma_raw, cut_kg, cut_kq, 0.0)
+    else:
+        add_row("CUT active", None, uq_h, uq_d, None, None, None, None, None, None)
+
     try:
+        kh_a = aashto_factor * kh
+        layer = layer_at_z(layers, max(zq, EPS))
+        coeff_a = en_active_coeffs_with_theta(layer["phi"], beta, alpha, delta_d, pren_theta_eq(kh_a, svq_h, uq_h))
+        if allow_qc_to_en_aashto:
+            kq_use, kc_use = derive_pren_qc_from_K(coeff_a["K_gamma"], layer["phi"], beta, "active")
+            coeff_a = {**coeff_a, "K_q": kq_use, "K_c": kc_use}
+        sigma_eff = coeff_a["K_gamma"] * (1.0 - aashto_kv) * effq
+        kq_term = coeff_a["K_q"] * aashto_q
+        kc_term = coeff_a["K_c"] * layer["c"] if aashto_use_c else 0.0
+        sigma_total = sigma_eff + uq_h + uq_d + kq_term - kc_term
+        add_row("AASHTO active", sigma_eff, uq_h, uq_d, kq_term, kc_term, sigma_total, coeff_a["K_gamma"], coeff_a["K_q"], coeff_a["K_c"])
+    except Exception:
+        add_row("AASHTO active", None, uq_h, uq_d, None, None, None, None, None, None)
+
+    try:
+        layer = layer_at_z(layers, max(zq, EPS))
         coeff_en_a = en_active_coeffs_with_theta(layer["phi"], beta, alpha, delta_d, pren_theta_eq(kh, svq_h, uq_h))
+        if allow_qc_to_en_aashto:
+            kq_use, kc_use = derive_pren_qc_from_K(coeff_en_a["K_gamma"], layer["phi"], beta, "active")
+            coeff_en_a = {**coeff_en_a, "K_q": kq_use, "K_c": kc_use}
         sigma_eff = coeff_en_a["K_gamma"] * (1.0 - en_kv) * effq
         kq_term = coeff_en_a["K_q"] * en_q
         kc_term = coeff_en_a["K_c"] * layer["c"] if en_use_c else 0.0
         sigma_total = sigma_eff + uq_h + uq_d + kq_term - kc_term
-        add_row("EN active", sigma_eff, uq_h, uq_d, kq_term, kc_term, sigma_total, coeff_en_a["K_gamma"], coeff_en_a["K_q"] if allow_qc_to_en_aashto else 0.0, coeff_en_a["K_c"] if allow_qc_to_en_aashto else 0.0)
+        add_row("EN active", sigma_eff, uq_h, uq_d, kq_term, kc_term, sigma_total, coeff_en_a["K_gamma"], coeff_en_a["K_q"], coeff_en_a["K_c"])
     except Exception:
         add_row("EN active", None, uq_h, uq_d, None, None, None, None, None, None)
 
     try:
-        coeff_prena = pren_active_coeffs(layer["phi"], beta, delta, pren_theta_eq(kh, svq_h, uq_h))
+        layer = layer_at_z(layers, max(zq, EPS))
+        coeff_prena = pren_active_coeffs(layer["phi"], beta, delta, pren_theta_eq(pren_alphaH, svq_h, uq_h))
         sigma_eff = coeff_prena["K_gamma"] * (svq_h - uq_h)
         kq_term = coeff_prena["K_q"] * pren_q
-        kc_term = coeff_prena["K_c"] * layer["c"]
+        kc_term = coeff_prena["K_c"] * layer["c"] if pren_use_c else 0.0
         sigma_total = sigma_eff + uq_h + uq_d + kq_term - kc_term
         add_row("prEN active", sigma_eff, uq_h, uq_d, kq_term, kc_term, sigma_total, coeff_prena["K_gamma"], coeff_prena["K_q"], coeff_prena["K_c"])
     except Exception:
         add_row("prEN active", None, uq_h, uq_d, None, None, None, None, None, None)
 
-    try:
-        kh_a = aashto_factor * kh
-        coeff_aashto = en_active_coeffs_with_theta(layer["phi"], beta, alpha, delta_d, pren_theta_eq(kh_a, svq_h, uq_h))
-        sigma_eff = coeff_aashto["K_gamma"] * (1.0 - aashto_kv) * effq
-        kq_term = coeff_aashto["K_q"] * aashto_q
-        kc_term = coeff_aashto["K_c"] * layer["c"] if aashto_use_c else 0.0
-        sigma_total = sigma_eff + uq_h + uq_d + kq_term - kc_term
-        add_row("AASHTO active", sigma_eff, uq_h, uq_d, kq_term, kc_term, sigma_total, coeff_aashto["K_gamma"], coeff_aashto["K_q"] if allow_qc_to_en_aashto else 0.0, coeff_aashto["K_c"] if allow_qc_to_en_aashto else 0.0)
-    except Exception:
-        add_row("AASHTO active", None, uq_h, uq_d, None, None, None, None, None, None)
+    if results["profiles"].get("cutp") is not None:
+        cutp = results["profiles"]["cutp"]
+        cut_sigma_raw = interpolate_piecewise(cutp["z"], cutp["sigma_raw"], zq)
+        cut_u = interpolate_piecewise(cutp["z"], cutp["u"], zq)
+        cut_ud = interpolate_piecewise(cutp["z"], cutp["ud"], zq)
+        cut_qterm = interpolate_piecewise(cutp["z"], cutp["qterm"], zq)
+        cut_kg = interpolate_piecewise(cutp["z"], cutp["K_gamma"], zq)
+        cut_kq = interpolate_piecewise(cutp["z"], cutp["K_q"], zq)
+        cut_sigma_eff = cut_sigma_raw - cut_qterm - cut_u - cut_ud
+        if cut_sigma_raw < 0.0:
+            add_row("CUT passive", "Tension", cut_u, cut_ud, cut_qterm, 0.0, "Tension", cut_kg, cut_kq, 0.0)
+        else:
+            add_row("CUT passive", cut_sigma_eff, cut_u, cut_ud, cut_qterm, 0.0, cut_sigma_raw, cut_kg, cut_kq, 0.0)
+    else:
+        add_row("CUT passive", None, uq_h, uq_d, None, None, None, None, None, None)
+
+    add_row("AASHTO passive", None, None, None, None, None, None, None, None, None)
 
     try:
+        layer = layer_at_z(layers, max(zq, EPS))
         coeff_en_p = en_passive_coeffs_with_theta(layer["phi"], beta, alpha, pren_theta_eq(kh, svq_h, uq_h))
+        if allow_qc_to_en_aashto:
+            kq_use, kc_use = derive_pren_qc_from_K(coeff_en_p["K_gamma"], layer["phi"], beta, "passive")
+            coeff_en_p = {**coeff_en_p, "K_q": kq_use, "K_c": kc_use}
         sigma_eff = coeff_en_p["K_gamma"] * (1.0 + en_kv) * effq
         kq_term = coeff_en_p["K_q"] * en_q
         kc_term = coeff_en_p["K_c"] * layer["c"] if en_use_c else 0.0
         sigma_total = sigma_eff + uq_h + uq_d + kq_term + kc_term
-        add_row("EN passive", sigma_eff, uq_h, uq_d, kq_term, kc_term, sigma_total, coeff_en_p["K_gamma"], coeff_en_p["K_q"] if allow_qc_to_en_aashto else 0.0, coeff_en_p["K_c"] if allow_qc_to_en_aashto else 0.0)
+        add_row("EN passive", sigma_eff, uq_h, uq_d, kq_term, kc_term, sigma_total, coeff_en_p["K_gamma"], coeff_en_p["K_q"], coeff_en_p["K_c"])
     except Exception:
         add_row("EN passive", None, uq_h, uq_d, None, None, None, None, None, None)
 
     try:
-        coeff_prenp = pren_passive_coeffs(layer["phi"], beta, delta, pren_theta_eq(kh, svq_h, uq_h))
+        layer = layer_at_z(layers, max(zq, EPS))
+        coeff_prenp = pren_passive_coeffs(layer["phi"], beta, delta, pren_theta_eq(pren_alphaH, svq_h, uq_h))
         sigma_eff = coeff_prenp["K_gamma"] * (svq_h - uq_h)
         kq_term = coeff_prenp["K_q"] * pren_q
-        kc_term = coeff_prenp["K_c"] * layer["c"]
+        kc_term = coeff_prenp["K_c"] * layer["c"] if pren_use_c else 0.0
         sigma_total = sigma_eff + uq_h + uq_d + kq_term + kc_term
         add_row("prEN passive", sigma_eff, uq_h, uq_d, kq_term, kc_term, sigma_total, coeff_prenp["K_gamma"], coeff_prenp["K_q"], coeff_prenp["K_c"])
     except Exception:
         add_row("prEN passive", None, uq_h, uq_d, None, None, None, None, None, None)
 
-    cuta = results["profiles"].get("cuta")
-    if cuta is not None:
-        iz = min(range(len(cuta["z"])), key=lambda i: abs(cuta["z"][i] - zq))
-        add_row("CUT active", cuta["sigma"][iz] - cuta["qterm"][iz] - cuta["u"][iz] - cuta["ud"][iz], cuta["u"][iz], cuta["ud"][iz], cuta["qterm"][iz], 0.0, cuta["sigma"][iz], cuta["K_gamma"][iz], cuta["K_q"][iz], 0.0)
-    else:
-        add_row("CUT active", None, uq_h, uq_d, None, None, None, None, None, None)
-
-    cutp = results["profiles"].get("cutp")
-    if cutp is not None:
-        iz = min(range(len(cutp["z"])), key=lambda i: abs(cutp["z"][i] - zq))
-        add_row("CUT passive", cutp["sigma"][iz] - cutp["qterm"][iz] - cutp["u"][iz] - cutp["ud"][iz], cutp["u"][iz], cutp["ud"][iz], cutp["qterm"][iz], 0.0, cutp["sigma"][iz], cutp["K_gamma"][iz], cutp["K_q"][iz], 0.0)
-    else:
-        add_row("CUT passive", None, uq_h, uq_d, None, None, None, None, None, None)
-
-    add_row("AASHTO passive", None, None, None, None, None, None, None, None, None)
     return pd.DataFrame(rows)
 
 
@@ -895,87 +1144,6 @@ def build_report_text(inputs, layers_df, results, point_df, active_notes, passiv
     return "\n".join(lines)
 
 
-def load_logo():
-    candidates = [Path("/mnt/data/logo.png"), Path(__file__).with_name("logo.png")]
-    for path in candidates:
-        if path.exists():
-            return Image.open(path)
-    return None
-
-
-def load_home_icon():
-    candidates = [Path("/mnt/data/home.png"), Path(__file__).with_name("home.png")]
-    for path in candidates:
-        if path.exists():
-            return path
-    return None
-
-
-def build_cutapps_card(home_icon_path):
-    if home_icon_path is None or not Path(home_icon_path).exists():
-        return f"""
-        <a href="{HOME_URL}" target="_blank" style="
-            display:block;
-            text-align:center;
-            padding:16px;
-            border:1px solid rgba(120,120,120,0.35);
-            border-radius:16px;
-            text-decoration:none;
-            font-weight:700;
-            color:inherit;
-            margin:4px 0 14px 0;
-            background:rgba(255,255,255,0.65);
-        ">CUT Apps</a>
-        """
-    mime = "image/png"
-    img_b64 = base64.b64encode(Path(home_icon_path).read_bytes()).decode("ascii")
-    return f"""
-    <a href="{HOME_URL}" target="_blank" style="
-        display:block;
-        padding:12px;
-        border:1px solid rgba(120,120,120,0.28);
-        border-radius:18px;
-        text-decoration:none;
-        color:inherit;
-        margin:4px 0 14px 0;
-        background:rgba(255,255,255,0.70);
-        box-shadow:0 1px 4px rgba(0,0,0,0.06);
-    ">
-        <img src="data:{mime};base64,{img_b64}" style="width:100%; display:block; border-radius:14px;" />
-    </a>
-    """
-
-
-def inject_sidebar_css():
-    st.markdown(
-        """
-        <style>
-        [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2,
-        [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 {
-            margin-top: 0.35rem;
-            margin-bottom: 0.45rem;
-        }
-        [data-testid="stSidebar"] .stExpander {
-            border-radius: 14px;
-            overflow: hidden;
-        }
-        [data-testid="stSidebar"] .stButton > button,
-        [data-testid="stSidebar"] .stDownloadButton > button {
-            width: 100%;
-            border-radius: 12px;
-            min-height: 2.8rem;
-        }
-        [data-testid="stSidebar"] .cutapps-note {
-            font-size: 0.92rem;
-            line-height: 1.35;
-            opacity: 0.9;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
 def main():
     st.set_page_config(page_title=PROGRAM_NAME, layout="wide")
     logo = load_logo()
@@ -1028,35 +1196,73 @@ def main():
             q = st.number_input("q (kPa) surcharge", value=0.0, step=1.0)
             allow_qc_to_en_aashto = st.checkbox("Apply the logic of prEN1998-5 for q and c to EN1998-5:2004 and AASHTO", value=True)
         with st.expander("Query depth", expanded=True):
-            z_query = st.number_input("z (m) from surface", value=2.0, step=0.5)
+            z_query = st.number_input("z (m) from surface", value=2.0, step=0.5, key="z_query")
+            z_trace = st.number_input("z (m) for CUT detailed calculations", value=2.0, step=0.5, key="z_trace")
 
     st.subheader("Soil data (layers from top to bottom)")
     default_layers = pd.DataFrame([
         {"Thickness": 6.0, "phi'": 30.0, "c'": 20.0, "gamma": 18.0, "gamma_sat": 20.0},
         {"Thickness": 1.0, "phi'": 30.0, "c'": 0.0, "gamma": 18.0, "gamma_sat": 20.0},
     ])
-    layers_df = st.data_editor(default_layers, num_rows="dynamic", use_container_width=True, key="layers_editor")
+    if "layers_df" not in st.session_state:
+        st.session_state.layers_df = default_layers.copy()
 
-    layers = build_layers_from_df(layers_df)
+    # --- add Select column if not exists ---
+    if "Select" not in st.session_state.layers_df.columns:
+        st.session_state.layers_df.insert(0, "Select", False)
+
+    add_col, remove_col, _ = st.columns([2, 2, 8])
+
+    with add_col:
+        if st.button("Add layer", key="add_layer_btn"):
+            new_row = {
+                "Select": False,
+                "Thickness": 1.0,
+                "phi'": 30.0,
+                "c'": 0.0,
+                "gamma": 18.0,
+                "gamma_sat": 20.0,
+            }
+            st.session_state.layers_df = pd.concat(
+                [st.session_state.layers_df, pd.DataFrame([new_row])],
+                ignore_index=True
+            )
+            st.rerun()
+
+    with remove_col:
+        if st.button("Remove selected", key="remove_selected_btn"):
+            df = st.session_state.layers_df.copy()
+            df = df[~df["Select"]]
+            df = df.drop(columns=["Select"])
+            df.insert(0, "Select", False)
+
+            if len(df) == 0:
+                st.warning("At least one layer must remain.")
+            else:
+                st.session_state.layers_df = df.reset_index(drop=True)
+                st.rerun()
+
+    layers_df = st.data_editor(
+        st.session_state.layers_df,
+        num_rows="fixed",
+        use_container_width=True,
+        key="layers_editor"
+    )
+
+    st.session_state.layers_df = layers_df.copy()
+
+    layers = build_layers_from_df(layers_df.drop(columns=["Select"]))
+
     if not layers:
         st.error("At least one layer with positive thickness is required.")
         st.stop()
+    
 
     inputs = {
-        "alpha": alpha,
-        "beta": beta,
-        "delta": delta,
-        "gamma_phi": gamma_phi,
-        "kh": kh,
-        "kv_abs": kv_abs,
-        "kv_negative": kv_negative,
-        "aashto_factor": aashto_factor,
-        "zwt": zwt,
-        "gamma_w": gamma_w,
-        "inner_flow": inner_flow,
-        "water_action_mode": water_action_mode,
-        "q": q,
-        "allow_qc_to_en_aashto": allow_qc_to_en_aashto,
+        "alpha": alpha, "beta": beta, "delta": delta, "gamma_phi": gamma_phi,
+        "kh": kh, "kv_abs": kv_abs, "kv_negative": kv_negative, "aashto_factor": aashto_factor,
+        "zwt": zwt, "gamma_w": gamma_w, "inner_flow": inner_flow, "water_action_mode": water_action_mode,
+        "q": q, "allow_qc_to_en_aashto": allow_qc_to_en_aashto,
     }
 
     results = build_results(inputs, layers)
@@ -1071,38 +1277,36 @@ def main():
     st.subheader("Resultant forces and point of application")
     st.dataframe(format_numeric_df(results["summary_df"]), use_container_width=True, hide_index=True)
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Indicative geometry", "Point level results", "Resultant forces and point of application", "Pressure distributions"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "Indicative geometry", "Point level results", "CUT detailed calculations at z",
+        "Resultant forces and point of application", "Pressure distributions"
+    ])
 
     with tab1:
         st.pyplot(plot_geometry(H, alpha, beta, zwt, layers), use_container_width=True)
 
     with tab2:
-        show_df = point_df.copy()
-
-        def _format_point_row(row):
-            is_na_row = row.get("Method") == "AASHTO passive"
-            formatted = {}
-            for col, val in row.items():
-                if col == "Method":
-                    formatted[col] = val
-                else:
-                    formatted[col] = _fmt_auto(val, na=(is_na_row and val is None))
-            return pd.Series(formatted)
-
-        show_df = show_df.apply(_format_point_row, axis=1)
-        st.dataframe(show_df, use_container_width=True, hide_index=True)
+        st.dataframe(format_numeric_df(point_df), use_container_width=True, hide_index=True)
         st.download_button("Download point results CSV", data=df_to_csv_download(point_df), file_name="point_results.csv", mime="text/csv")
 
     with tab3:
-        summary_fmt = format_numeric_df(results["summary_df"])
-        st.dataframe(summary_fmt, use_container_width=True, hide_index=True)
+        trace_active = build_cut_trace_for_z_mode(z_trace, "active", layers, H, beta, kh, (-kv_abs if kv_negative else kv_abs), gamma_w, zwt, q, inner_flow, water_action_mode)
+        trace_passive = build_cut_trace_for_z_mode(z_trace, "passive", layers, H, beta, kh, (-kv_abs if kv_negative else kv_abs), gamma_w, zwt, q, inner_flow, water_action_mode)
+        cta, ctp = st.columns(2)
+        with cta:
+            st.text_area("Active CUT", trace_active, height=700)
+        with ctp:
+            st.text_area("Passive CUT", trace_passive, height=700)
+
+    with tab4:
+        st.dataframe(format_numeric_df(results["summary_df"]), use_container_width=True, hide_index=True)
         c1, c2 = st.columns(2)
         with c1:
             st.text_area("Active notes / warnings", active_notes, height=360)
         with c2:
             st.text_area("Passive notes / warnings", passive_notes, height=360)
 
-    with tab4:
+    with tab5:
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(9, 8), sharex=False)
         profiles = results["profiles"]
         if profiles["ena"].get("z"):
@@ -1122,6 +1326,7 @@ def main():
             ax2.plot(profiles["cutp"]["sigma"], profiles["cutp"]["z"], '-', linewidth=2.6, label="CUT passive", color=METHOD_COLORS["CUT passive"])
 
         for ax, title, xlabel in [(ax1, "Active-side distributions", "Active earth pressure (kPa)"), (ax2, "Passive-side distributions", "Passive earth pressure (kPa)")]:
+            ax.axvline(0.0, color="black", linewidth=3.2, alpha=0.95)
             ax.invert_yaxis()
             ax.set_title(title)
             ax.set_xlabel(xlabel)

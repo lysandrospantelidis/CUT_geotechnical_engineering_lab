@@ -43,9 +43,9 @@
       "description": "Rankine earth-pressure tool for smooth vertical walls.",
       "url": "https://cut-k-rankine-v6.streamlit.app/",
       "note": "Suitable for desktop and mobile access.",
-      "asset_name_contains": "CUT_K_Coulomb",
+      "asset_name_contains": "CUT_K_Rankine",
       "asset_ext": ".exe",
-      "release_tag_contains": "k-coulomb",
+      "release_tag_contains": "k-rankine",
       "tracking_id": "cut_k_rankine",
       "tracking_category": "earth_pressure",
       "tracking_type": "web_app"
@@ -56,13 +56,13 @@
       "description": "Seismic earth-pressure analysis and comparison tool (EN 1998-5, prEN 1998-5, AASHTO, CUT) with layered soils, groundwater, surcharge, and pressure distributions.",
       "url": "https://cut-seismic-earth-pressure-toolkit-v16-3.streamlit.app/",
       "note": "Suitable for desktop and mobile access.",
-      "asset_name_contains": "cut_seismic_earth_pressure_toolkit
+      "asset_name_contains": "cut_seismic_earth_pressure_toolkit",
       "asset_ext": ".exe",
       "release_tag_contains": "cut-seismic-earth-pressure-toolkit",
       "tracking_id": "cut_seismic_earth_pressure_toolkit",
       "tracking_category": "earth_pressure",
       "tracking_type": "web_app"
-    },
+    },    
     {
       "title": "CUT Rock Key",
       "tag": "Web application",
@@ -146,7 +146,7 @@
       "tag": "Windows executable (.exe)",
       "description": "Standalone desktop version of the CUT Seismic Earth Pressure Toolkit for local execution on Windows systems.",
       "note": "Suitable for local classroom, lab, office, and offline use.",
-      "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
+      "asset_name_contains": "cut_seismic_earth_pressure_toolkit",
       "asset_ext": ".exe",
       "release_tag_contains": "cut-seismic-earth-pressure-toolkit",
       "tracking_id": "cut_seismic_earth_pressure_toolkit_v16_3",
@@ -264,7 +264,7 @@
       "description": "User manual and references for the CUT Seismic Earth Pressure Toolkit.",
       "manual_repo_folder": "programs/CUT_Seismic_Earth_Pressure_Toolkit",
       "manual_file_contains": "CUT_Seismic_Earth_Pressure_Toolkit_User_Manual",
-      "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
+      "asset_name_contains": "cut_seismic_earth_pressure_toolkit",
       "asset_ext": ".exe",
       "release_tag_contains": "cut-seismic-earth-pressure-toolkit",
       "references": [

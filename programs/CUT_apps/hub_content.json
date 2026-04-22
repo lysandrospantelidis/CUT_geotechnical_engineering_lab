@@ -54,7 +54,7 @@
       "title": "CUT Seismic Earth Pressure Toolkit",
       "tag": "Web application",
       "description": "Seismic earth-pressure analysis and comparison tool (EN 1998-5, prEN 1998-5, AASHTO, CUT) with layered soils, groundwater, surcharge, and pressure distributions.",
-      "url": "https://cut-seismic-earth-pressure-toolkit.streamlit.app/",
+      "url": "https://cut-seismic-earth-pressure-toolkit-v16-3.streamlit.app/",
       "note": "Suitable for desktop and mobile access.",
       "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
       "asset_ext": ".exe",

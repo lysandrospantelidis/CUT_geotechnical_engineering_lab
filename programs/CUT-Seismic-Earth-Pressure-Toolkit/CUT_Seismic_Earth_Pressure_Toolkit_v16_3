@@ -14,7 +14,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 PROGRAM_NAME = "CUT_K_EN1998_AASHTO_prEN"
-VERSION = "v14"
+VERSION = "v16.3"
 AUTHOR = "Dr Lysandros Pantelidis, Cyprus University of Technology"
 CUT_LOGO_URL = "https://www.cut.ac.cy/digitalAssets/17/17780_100tepak-logo.png"
 HOME_URL = "https://cut-apps.streamlit.app/"
@@ -106,6 +106,26 @@ def _fmt_theta(value, nr=False, na=False):
     if nr:
         return "θ=NR"
     return f"θ={value:.2f}" if value is not None else "—"
+
+
+def _fmt_cell3(value, nr=False, na=False):
+    if isinstance(value, str):
+        return value
+    return _fmt_res3(value, nr=nr, na=na)
+
+
+def derive_pren_qc_from_K(K_gamma, phi_deg, beta_deg, mode):
+    phi = math.radians(phi_deg)
+    cosb = math.cos(math.radians(beta_deg))
+    _require_positive("cos(beta)", cosb)
+    tanphi = math.tan(phi)
+    _require_positive("tan(phi)", tanphi)
+    K_q = K_gamma / cosb
+    if mode == "active":
+        K_c = (1.0 - K_gamma) / tanphi
+    else:
+        K_c = (K_gamma - 1.0) / tanphi
+    return K_q, K_c
 
 # ---------------- layer helpers ----------------
 def weighted_average(layers, key):
@@ -346,7 +366,8 @@ def cut_phi_m_from_parameters(phi_deg, c_val, sigma_v, u, theta, av, xi, xi1, xi
     if abs(denomB) <= 1e-20:
         raise GeometryError("CUT: invalid denominator for e2.")
 
-    e2 = (1.0 + A0) / denomB + 2.0 * c_val / (((1.0 - av) * (sigma_v - u)) * denomB * tan_phi)
+    denominator_term = max((1.0 - av) * (sigma_v - u) * (2.0 * lam - 1.0) * B1 * tan_phi, 1e-20)
+    e2 = (1.0 + A0) / denomB + 2.0 * c_val / denominator_term
 
     tan2 = tan_phi ** 2
     a0 = 1.0 + (e2 ** 2) * tan2
@@ -357,35 +378,22 @@ def cut_phi_m_from_parameters(phi_deg, c_val, sigma_v, u, theta, av, xi, xi1, xi
     D0 = b0 ** 2 - 3.0 * a0 * c0
     D1 = 2.0 * b0 ** 3 - 9.0 * a0 * b0 * c0 + 27.0 * (a0 ** 2) * d0
 
-    disc = complex(D1 ** 2 - 4.0 * (D0 ** 3), 0.0)
-    inside = 0.5 * (complex(D1, 0.0) - disc ** 0.5)
-    C0 = inside ** (1.0 / 3.0) if abs(inside) > 1e-30 else complex(0.0, 0.0)
+    inside_sqrt = complex(D1 ** 2 - 4.0 * (D0 ** 3), 0.0)
+    inside = 0.5 * (complex(D1, 0.0) - inside_sqrt ** 0.5)
+    C0 = inside ** (1.0 / 3.0)
     if abs(C0) <= 1e-30:
         raise GeometryError("CUT: invalid cubic solution.")
 
-    omega = [
-        complex(1.0, 0.0),
-        complex(-0.5,  math.sqrt(3.0)/2.0),
-        complex(-0.5, -math.sqrt(3.0)/2.0),
-    ]
+    zeta = complex(-0.5, math.sqrt(3.0) / 2.0)
+    zlam = zeta ** lam
+    x = -(2.0 * lam - 1.0) * (b0 + D0 / (C0 * zlam) + C0 * zlam) / (3.0 * a0)
 
-    roots = []
-    sgn = (2.0 * lam - 1.0)
-
-    for w in omega:
-        xk = -sgn * (b0 + D0/(C0*w) + C0*w) / (3.0*a0)
-        if abs(xk.imag) < 1e-8:
-            xr = xk.real
-            if -1.0 <= xr <= 1.0:
-                phi_k = math.degrees(math.asin(xr))
-                if 0.0 <= phi_k <= phi_deg + 1e-8:
-                    roots.append((abs(phi_deg - phi_k), phi_k, xr))
-
-    if not roots:
-        raise GeometryError("CUT: no physically admissible root.")
-
-    roots.sort(key=lambda t: t[0])
-    phi_m = roots[0][1]
+    x_real = x.real
+    if x_real > 1.0:
+        x_real = 1.0
+    elif x_real < -1.0:
+        x_real = -1.0
+    phi_m = math.degrees(math.asin(x_real))
 
     return {
         "lambda": lam, "A0": A0, "B1": B1, "e1": e1, "e2": e2,
@@ -411,22 +419,23 @@ def cut_kxe_from_phi_m(phi_m_deg, phi_deg, c_val, sigma_v, u, av, lam):
 def cut_profile(mode, layers, H, beta_deg, alphaH, av, gamma_w, zwt, q,
                 kh=0.0, inner_flow="impervious", include_retained_dynamic=True, npts=401):
     zvals = [H * i / (npts - 1) for i in range(npts)]
-    sigma=[]; theta_vals=[]; Kg=[]; Kq=[]; Kc=[]; qterm=[]; cterm=[]; uvals=[]; udvals=[]; svvals=[]; phim_vals=[]; cm_vals=[]
+    sigma=[]; sigma_raw=[]; sigma_res=[]; tension_flags=[]; theta_vals=[]; Kg=[]; Kq=[]; Kc=[]; qterm=[]; cterm=[]; uvals=[]; udvals=[]; svvals=[]; phim_vals=[]; cm_vals=[]
     xi, xi1, xi2 = cut_failure_xi_set()
 
     for z in zvals:
-        layer = layer_at_z(layers, z if z > 1e-9 else 1e-9)
+        z_eval = max(z, 0.001)
+        layer = layer_at_z(layers, z_eval)
         c0 = max(layer["c"], 0.001)
 
-        sv, u_h = sigma_v_u_layered(z, layers, zwt, gamma_w)
+        sv, u_h = sigma_v_u_layered(z_eval, layers, zwt, gamma_w)
         _, _, u_d, _ = retained_side_u_total(
-            z, H, layers, zwt, gamma_w, kh, inner_flow,
+            z_eval, H, layers, zwt, gamma_w, kh, inner_flow,
             include_dynamic=include_retained_dynamic
         )
 
         try:
             phi_adj, c_adj, _, dsig_beta = cut_empirical_adjustment(
-                layer["phi"], c0, layer["gd"], beta_deg, 0.0, mode, z=z
+                layer["phi"], c0, layer["gd"], beta_deg, 0.0, mode, z=z_eval
             )
 
             sigma_v_adj = sv + dsig_beta
@@ -441,9 +450,15 @@ def cut_profile(mode, layers, H, beta_deg, alphaH, av, gamma_w, zwt, q,
             )
 
             qterm_i = KXE * q
-            sigma_total = sigma_xe + qterm_i + u_d
+            sigma_total_raw = sigma_xe + qterm_i + u_d
+            is_tension = sigma_total_raw < 0.0
+            sigma_total_plot = float('nan') if is_tension else sigma_total_raw
+            sigma_total_res = 0.0 if is_tension else sigma_total_raw
 
-            sigma.append(sigma_total)
+            sigma.append(sigma_total_plot)
+            sigma_raw.append(sigma_total_raw)
+            sigma_res.append(sigma_total_res)
+            tension_flags.append(is_tension)
             theta_vals.append(math.degrees(theta_adj))
             Kg.append(KXE)
             Kq.append(KXE)
@@ -458,6 +473,9 @@ def cut_profile(mode, layers, H, beta_deg, alphaH, av, gamma_w, zwt, q,
 
         except Exception:
             sigma.append(0.0)
+            sigma_raw.append(0.0)
+            sigma_res.append(0.0)
+            tension_flags.append(False)
             theta_vals.append(0.0)
             Kg.append(0.0)
             Kq.append(0.0)
@@ -470,16 +488,16 @@ def cut_profile(mode, layers, H, beta_deg, alphaH, av, gamma_w, zwt, q,
             phim_vals.append(0.0)
             cm_vals.append(0.0)
 
-    P, ybar = positive_resultant_from_arrays(zvals, sigma)
+    P, ybar = positive_resultant_from_arrays(zvals, sigma_res)
 
     return {
-        "z": zvals, "sigma": sigma, "P": P, "ybar_base": ybar, "theta_deg": theta_vals,
+        "z": zvals, "sigma": sigma, "sigma_raw": sigma_raw, "sigma_resultant": sigma_res, "tension": tension_flags, "P": P, "ybar_base": ybar, "theta_deg": theta_vals,
         "K_gamma": Kg, "K_q": Kq, "K_c": Kc, "qterm": qterm, "cterm": cterm,
         "u": uvals, "ud": udvals, "sv": svvals,
         "phi_m_deg": phim_vals, "c_m": cm_vals,
         "base_K_gamma": Kg[-1], "base_K_q": Kq[-1], "base_K_c": Kc[-1], "base_theta_deg": theta_vals[-1],
         "base_phi_m_deg": phim_vals[-1], "base_c_m": cm_vals[-1],
-        "top_sigma": sigma[0], "base_sigma": sigma[-1]
+        "top_sigma": sigma_raw[0], "base_sigma": sigma_raw[-1]
     }
 
 
@@ -528,20 +546,28 @@ def pointwise_method_profile(method, mode, layers, H, alpha_deg, beta_deg, delta
         if method == "EN":
             if mode == "active":
                 coeff = en_active_coeffs_with_theta(layer["phi"], beta_deg, alpha_deg, delta_deg, theta)
-                cterm_i = -coeff["K_c"] * layer["c"] if c_mode_on else 0.0
                 sigma_eff = coeff["K_gamma"] * (1.0 - kv) * (sv - u_h)
             else:
                 coeff = en_passive_coeffs_with_theta(layer["phi"], beta_deg, alpha_deg, theta)
-                cterm_i = coeff["K_c"] * layer["c"] if c_mode_on else 0.0
                 sigma_eff = coeff["K_gamma"] * (1.0 + kv) * (sv - u_h)
         elif method == "AASHTO":
             if mode != "active":
                 raise GeometryError("AASHTO passive is not defined.")
             coeff = en_active_coeffs_with_theta(layer["phi"], beta_deg, alpha_deg, delta_deg, theta)
-            cterm_i = -coeff["K_c"] * layer["c"] if c_mode_on else 0.0
             sigma_eff = coeff["K_gamma"] * (1.0 - kv) * (sv - u_h)
         else:
             raise ValueError("Unknown method")
+
+        if c_mode_on:
+            K_q_use, K_c_use = derive_pren_qc_from_K(coeff["K_gamma"], layer["phi"], beta_deg, mode)
+        else:
+            K_q_use, K_c_use = coeff["K_q"], coeff["K_c"]
+
+        coeff = {**coeff, "K_q": K_q_use, "K_c": K_c_use}
+        if mode == "active":
+            cterm_i = -coeff["K_c"] * layer["c"] if c_mode_on else 0.0
+        else:
+            cterm_i = coeff["K_c"] * layer["c"] if c_mode_on else 0.0
         qterm_i = coeff["K_q"] * q
         s = sigma_eff + qterm_i + cterm_i + u_h + u_d
         sigma.append(s); theta_vals.append(coeff["theta_deg"]); Kg.append(coeff["K_gamma"]); Kq.append(coeff["K_q"]); Kc.append(coeff["K_c"])
@@ -722,6 +748,133 @@ def wall_x_at_depth(H, alpha_deg, z_from_surface):
     xb = H * math.tan(math.radians(alpha_deg))
     return xb * (z_from_surface / H)
 
+
+def _dbg_num(v):
+    if v is None:
+        return "None"
+    try:
+        if isinstance(v, complex):
+            return f"{v.real:.12g}{v.imag:+.12g}j"
+        return f"{float(v):.12g}"
+    except Exception:
+        return str(v)
+
+def _debug_append(lines, label, value):
+    lines.append(f"{label} = {_dbg_num(value)}")
+
+def build_cut_trace_for_z_mode(zq, mode, layers, H, beta_deg, alphaH, av, gamma_w, zwt, q,
+                               inner_flow, retained_water_mode):
+    lines = []
+    zq = max(0.0, min(H, float(zq)))
+    z_eval = max(zq, 0.001)
+    layer = layer_at_z(layers, z_eval)
+    c0_input = max(layer["c"], 0.001)
+    sv, u_h = sigma_v_u_layered(z_eval, layers, zwt, gamma_w)
+    _, _, u_d, _ = retained_side_u_total(
+        z_eval, H, layers, zwt, gamma_w, alphaH, inner_flow,
+        include_dynamic=(retained_water_mode == "hydrodynamic")
+    )
+
+    lines.append(f"CUT {mode.upper()} at z = {_dbg_num(zq)} m")
+    lines.append("")
+    lines.append("1. Input data at this depth")
+    _debug_append(lines, "z", zq)
+    _debug_append(lines, "z_eval used by CUT", z_eval)
+    _debug_append(lines, "Layer.phi", layer["phi"])
+    _debug_append(lines, "Layer.c", layer["c"])
+    _debug_append(lines, "Layer.gd", layer["gd"])
+    _debug_append(lines, "Layer.gs", layer["gs"])
+    _debug_append(lines, "alphaH = kh", alphaH)
+    _debug_append(lines, "a_v = kv", av)
+    _debug_append(lines, "beta", beta_deg)
+    _debug_append(lines, "q", q)
+    lines.append("")
+
+    lines.append("2. Vertical stress and pore pressures")
+    _debug_append(lines, "sigma_v", sv)
+    _debug_append(lines, "u_h", u_h)
+    _debug_append(lines, "u_d", u_d)
+    _debug_append(lines, "sigma_v - u_h", sv - u_h)
+    lines.append("")
+
+    lines.append("3. Internal cohesion floor used by CUT")
+    _debug_append(lines, "c0 = max(c, 0.001)", c0_input)
+    lines.append("")
+
+    try:
+        phi_adj, c_adj, gamma_adj, dsig_beta = cut_empirical_adjustment(
+            layer["phi"], c0_input, layer["gd"], beta_deg, 0.0, mode, z=z_eval
+        )
+
+        lines.append("4. Empirical backslope correction (applied only through beta)")
+        _debug_append(lines, "phi_adj", phi_adj)
+        _debug_append(lines, "c_adj", c_adj)
+        _debug_append(lines, "gamma_adj", gamma_adj)
+        _debug_append(lines, "Delta sigma_beta", dsig_beta)
+        lines.append("")
+
+        sigma_v_adj = sv + dsig_beta
+        theta_adj = cut_theta_eq(alphaH, av, sigma_v_adj, u_h)
+
+        lines.append("5. Adjusted vertical stress and seismic angle")
+        _debug_append(lines, "sigma_v_adj = sigma_v + Delta sigma_beta", sigma_v_adj)
+        _debug_append(lines, "theta_eq (deg)", math.degrees(theta_adj))
+        lines.append("")
+
+        xi, xi1, xi2 = cut_failure_xi_set()
+        lines.append("6. Failure-state constants")
+        _debug_append(lines, "xi", xi)
+        _debug_append(lines, "xi1", xi1)
+        _debug_append(lines, "xi2", xi2)
+        lines.append("")
+
+        lam, A0, B1 = cut_lambda_a0_b1(phi_adj, c_adj, sigma_v_adj, u_h, theta_adj, av, xi, xi1, xi2, mode)
+
+        lines.append("7. Compute lambda, A0, B1")
+        if mode == "active":
+            lines.append("lambda criterion: active state -> lambda = 1.0 by definition")
+        else:
+            lines.append("lambda criterion: passive state -> lambda = 0 if A0 >= 1, else lambda = 1")
+        _debug_append(lines, "lambda", lam)
+        _debug_append(lines, "A0", A0)
+        _debug_append(lines, "B1", B1)
+        lines.append("")
+
+        phim = cut_phi_m_from_parameters(phi_adj, c_adj, sigma_v_adj, u_h, theta_adj, av, xi, xi1, xi2, mode)
+
+        lines.append("8. Cubic-solution intermediates for phi_m")
+        _debug_append(lines, "e1", phim["e1"])
+        _debug_append(lines, "e2", phim["e2"])
+        _debug_append(lines, "a0", phim["a0"])
+        _debug_append(lines, "b0", phim["b0"])
+        _debug_append(lines, "c0_cubic", phim["c0"])
+        _debug_append(lines, "d0", phim["d0"])
+        _debug_append(lines, "D0", phim["D0"])
+        _debug_append(lines, "D1", phim["D1"])
+        _debug_append(lines, "C0", phim["C0"])
+        lines.append("zeta = -1/2 + sqrt(3)/2 * i")
+        _debug_append(lines, "phi_m (deg)", phim["phi_m_deg"])
+        lines.append("")
+
+        KXE, c_m, sigma_xe = cut_kxe_from_phi_m(phim["phi_m_deg"], phi_adj, c_adj, sigma_v_adj, u_h, av, phim["lambda"])
+        qterm_i = KXE * q
+        sigma_total = sigma_xe + qterm_i + u_d
+
+        lines.append("9. Final CUT quantities")
+        _debug_append(lines, "K_XE", KXE)
+        _debug_append(lines, "c_m", c_m)
+        _debug_append(lines, "sigma_xe", sigma_xe)
+        _debug_append(lines, "K_XE * q", qterm_i)
+        _debug_append(lines, "final sigma_raw = sigma_xe + K_XE*q + u_d", sigma_total)
+        if sigma_total < 0.0:
+            lines.append("final status = TENSION -> rejected (not plotted, not included in resultant)")
+        else:
+            _debug_append(lines, "final sigma accepted", sigma_total)
+    except Exception as e:
+        lines.append(f"ERROR: {e}")
+
+    return "\n".join(lines)
+
 # ---------------- GUI ----------------
 class App:
     def __init__(self, root):
@@ -880,8 +1033,8 @@ class App:
         # tabs
         self.nb = ttk.Notebook(right); self.nb.grid(row=0,column=0,sticky="nsew")
         nb = self.nb
-        self.tab_data = ttk.Frame(nb); self.tab_dp = ttk.Frame(nb); self.tab_results = ttk.Frame(nb); self.tab_dist = ttk.Frame(nb)
-        nb.add(self.tab_data, text="Point level results"); nb.add(self.tab_results, text="Resultant forces and point of application"); nb.add(self.tab_dist, text="Pressure distributions")
+        self.tab_data = ttk.Frame(nb); self.tab_dp = ttk.Frame(nb); self.tab_trace = ttk.Frame(nb); self.tab_results = ttk.Frame(nb); self.tab_dist = ttk.Frame(nb)
+        nb.add(self.tab_data, text="Point level results"); nb.add(self.tab_trace, text="CUT detailed calculations at z"); nb.add(self.tab_results, text="Resultant forces and point of application"); nb.add(self.tab_dist, text="Pressure distributions")
 
         # Data tab geometry
         self.tab_data.columnconfigure(0,weight=1)
@@ -950,6 +1103,41 @@ class App:
         ).grid(row=3, column=0, sticky="w", padx=6, pady=(0,4))
 
         zp.columnconfigure(0,weight=1); zp.rowconfigure(1,weight=1)
+
+        # CUT detailed calculations at z tab
+        self.tab_trace.columnconfigure(0, weight=1)
+        self.tab_trace.rowconfigure(1, weight=1)
+        trace_controls = ttk.Frame(self.tab_trace)
+        trace_controls.grid(row=0, column=0, sticky="ew", padx=6, pady=6)
+        trace_controls.columnconfigure(4, weight=1)
+        self.z_query_trace = tk.DoubleVar(value=0.0)
+        ttk.Label(trace_controls, text="z (m) from surface").grid(row=0, column=0, sticky="w", padx=(0,6), pady=2)
+        ttk.Entry(trace_controls, textvariable=self.z_query_trace, width=10).grid(row=0, column=1, sticky="w", padx=(0,6), pady=2)
+        ttk.Button(trace_controls, text="Update CUT calculations", command=self.compute).grid(row=0, column=2, sticky="w", padx=(0,8), pady=2)
+
+        trace_box = ttk.Frame(self.tab_trace)
+        trace_box.grid(row=1, column=0, sticky="nsew", padx=6, pady=(0,6))
+        trace_box.columnconfigure(0, weight=1)
+        trace_box.columnconfigure(1, weight=1)
+        trace_box.rowconfigure(0, weight=1)
+
+        active_trace_box = ttk.LabelFrame(trace_box, text="Active CUT")
+        active_trace_box.grid(row=0, column=0, sticky="nsew", padx=(0,3))
+        active_trace_box.columnconfigure(0, weight=1); active_trace_box.rowconfigure(0, weight=1)
+        self.text_trace_active = tk.Text(active_trace_box, wrap="word", font=("Consolas", 10), padx=10, pady=8)
+        trace_scroll_a = ttk.Scrollbar(active_trace_box, orient="vertical", command=self.text_trace_active.yview)
+        self.text_trace_active.configure(yscrollcommand=trace_scroll_a.set)
+        self.text_trace_active.grid(row=0, column=0, sticky="nsew")
+        trace_scroll_a.grid(row=0, column=1, sticky="ns")
+
+        passive_trace_box = ttk.LabelFrame(trace_box, text="Passive CUT")
+        passive_trace_box.grid(row=0, column=1, sticky="nsew", padx=(3,0))
+        passive_trace_box.columnconfigure(0, weight=1); passive_trace_box.rowconfigure(0, weight=1)
+        self.text_trace_passive = tk.Text(passive_trace_box, wrap="word", font=("Consolas", 10), padx=10, pady=8)
+        trace_scroll_p = ttk.Scrollbar(passive_trace_box, orient="vertical", command=self.text_trace_passive.yview)
+        self.text_trace_passive.configure(yscrollcommand=trace_scroll_p.set)
+        self.text_trace_passive.grid(row=0, column=0, sticky="nsew")
+        trace_scroll_p.grid(row=0, column=1, sticky="ns")
 
         # Results tab
         self.tab_results.columnconfigure(0,weight=1); self.tab_results.rowconfigure(0,weight=1)
@@ -1564,8 +1752,8 @@ class App:
                 "EN 1998-5", f"{kh:.3f}", f"{en_kv:.3f}",
                 _fmt_res3(Ed_a_disp, nr=ena_nr),
                 _fmt_res4(ena['K'] if ena else None, nr=ena_nr),
-                _fmt_res4(ena['K'] if (ena and allow_qc_to_en_aashto) else 0.0, nr=ena_nr if allow_qc_to_en_aashto else False),
-                _fmt_res4(ena['K'] if (ena and allow_qc_to_en_aashto) else 0.0, nr=ena_nr if allow_qc_to_en_aashto else False),
+                _fmt_res4(ena_prof['base_K_q'] if ena else (0.0 if not allow_qc_to_en_aashto else None), nr=ena_nr if allow_qc_to_en_aashto else False),
+                _fmt_res4(ena_prof['base_K_c'] if ena else (0.0 if not allow_qc_to_en_aashto else None), nr=ena_nr if allow_qc_to_en_aashto else False),
                 _fmt_theta(ena['theta_deg'] if ena else None, nr=ena_nr)
             ))
             self.tree_active.insert("", "end", values=(
@@ -1580,8 +1768,8 @@ class App:
                 "AASHTO", f"{kh_a:.3f}", f"{aashto_kv:.3f}",
                 _fmt_res3(P_AE_disp, nr=aask_nr),
                 _fmt_res4(aask['K'] if aask else None, nr=aask_nr),
-                _fmt_res4(aask['K'] if (aask and allow_qc_to_en_aashto) else 0.0, nr=aask_nr if allow_qc_to_en_aashto else False),
-                _fmt_res4(aask['K'] if (aask and allow_qc_to_en_aashto) else 0.0, nr=aask_nr if allow_qc_to_en_aashto else False),
+                _fmt_res4(aashto_prof['base_K_q'] if aask else (0.0 if not allow_qc_to_en_aashto else None), nr=aask_nr if allow_qc_to_en_aashto else False),
+                _fmt_res4(aashto_prof['base_K_c'] if aask else (0.0 if not allow_qc_to_en_aashto else None), nr=aask_nr if allow_qc_to_en_aashto else False),
                 _fmt_theta(aask['theta_deg'] if aask else None, nr=aask_nr)
             ))
             self.tree_active.insert("", "end", values=(
@@ -1597,8 +1785,8 @@ class App:
                 "EN 1998-5", f"{kh:.3f}", f"{en_kv:.3f}",
                 _fmt_res3(Ed_p, nr=enp_nr),
                 _fmt_res4(enp['K'] if enp else None, nr=enp_nr),
-                _fmt_res4(enp['K'] if (enp and allow_qc_to_en_aashto) else 0.0, nr=enp_nr if allow_qc_to_en_aashto else False),
-                _fmt_res4(enp['K'] if (enp and allow_qc_to_en_aashto) else 0.0, nr=enp_nr if allow_qc_to_en_aashto else False),
+                _fmt_res4(enp_prof['base_K_q'] if enp else (0.0 if not allow_qc_to_en_aashto else None), nr=enp_nr if allow_qc_to_en_aashto else False),
+                _fmt_res4(enp_prof['base_K_c'] if enp else (0.0 if not allow_qc_to_en_aashto else None), nr=enp_nr if allow_qc_to_en_aashto else False),
                 _fmt_theta(enp['theta_deg'] if enp else None, nr=enp_nr)
             ))
             self.tree_passive.insert("", "end", values=(
@@ -1698,7 +1886,7 @@ class App:
             
             # z tables (independent inputs for each tab)
             def populate_z_tree(tree, z_value):
-                zq = max(0.0, min(H, float(z_value)))
+                zq = max(0.001, min(H, float(z_value)))
 
                 svq_h, uq_h = sigma_v_u_layered(zq, layers, pren_zwt, gamma_w)
                 _, _, uq_d, _ = retained_side_u_total(
@@ -1714,16 +1902,54 @@ class App:
                 def insert_row(method, sigma_eff, u_val, ud_val, w_val, kq_term, kc_term, sigma_total, kgamma, kq_val, kc_val, nr=False, na=False):
                     tree.insert("", "end", values=(
                         method,
-                        _fmt_res3(sigma_eff, nr=nr, na=na),
-                        _fmt_res3(u_val, nr=nr, na=na),
-                        _fmt_res3(ud_val, nr=nr, na=na),
-                        _fmt_res3(kq_term, nr=nr, na=na),
-                        _fmt_res3(kc_term, nr=nr, na=na),
-                        _fmt_res3(sigma_total, nr=nr, na=na),
-                        _fmt_res3(kgamma, nr=nr, na=na),
-                        _fmt_res3(kq_val, nr=nr, na=na),
-                        _fmt_res3(kc_val, nr=nr, na=na)
+                        _fmt_cell3(sigma_eff, nr=nr, na=na),
+                        _fmt_cell3(u_val, nr=nr, na=na),
+                        _fmt_cell3(ud_val, nr=nr, na=na),
+                        _fmt_cell3(kq_term, nr=nr, na=na),
+                        _fmt_cell3(kc_term, nr=nr, na=na),
+                        _fmt_cell3(sigma_total, nr=nr, na=na),
+                        _fmt_cell3(kgamma, nr=nr, na=na),
+                        _fmt_cell3(kq_val, nr=nr, na=na),
+                        _fmt_cell3(kc_val, nr=nr, na=na)
                     ))
+
+                if cuta is not None:
+                    cut_sigma_raw = interpolate_piecewise(cuta["z"], cuta["sigma_raw"], zq)
+                    cut_u = interpolate_piecewise(cuta["z"], cuta["u"], zq)
+                    cut_ud = interpolate_piecewise(cuta["z"], cuta["ud"], zq)
+                    cut_qterm = interpolate_piecewise(cuta["z"], cuta["qterm"], zq)
+                    cut_kg = interpolate_piecewise(cuta["z"], cuta["K_gamma"], zq)
+                    cut_kq = interpolate_piecewise(cuta["z"], cuta["K_q"], zq)
+                    cut_sigma_eff = cut_sigma_raw - cut_qterm - cut_u - cut_ud
+                    if cut_sigma_raw < 0.0:
+                        insert_row("CUT active", "Tension", cut_u, cut_ud, 0.0,
+                                   cut_qterm, 0.0, "Tension", cut_kg, cut_kq, 0.0)
+                    else:
+                        insert_row("CUT active", cut_sigma_eff, cut_u, cut_ud, 0.0,
+                                   cut_qterm, 0.0, cut_sigma_raw, cut_kg, cut_kq, 0.0)
+                else:
+                    insert_row("CUT active", None, uq_h, uq_d, 0.0, None, None, None, None, None, None)
+
+                if aashto_prof is not None and aashto_prof.get("z"):
+                    try:
+                        coeff_aashto = en_active_coeffs_with_theta(
+                            layer_at_z(layers, max(zq,1e-9))["phi"], beta, alpha, delta_d,
+                            pren_theta_eq(kh_a, svq_h, uq_h)
+                        )
+                        if allow_qc_to_en_aashto:
+                            Kq_use, Kc_use = derive_pren_qc_from_K(coeff_aashto["K_gamma"], layer_at_z(layers, max(zq,1e-9))["phi"], beta, "active")
+                            coeff_aashto = {**coeff_aashto, "K_q": Kq_use, "K_c": Kc_use}
+                        sigma_eff = coeff_aashto["K_gamma"] * (1.0 - aashto_kv) * effq
+                        kq_term = coeff_aashto["K_q"] * aashto_q
+                        kc_term = coeff_aashto["K_c"] * layer_at_z(layers, max(zq,1e-9))["c"] if aashto_use_c else 0.0
+                        sigma_total = sigma_eff + uq_h + uq_d + kq_term - kc_term
+                        insert_row("AASHTO active", sigma_eff, uq_h, uq_d, 0.0, kq_term, kc_term, sigma_total,
+                                   coeff_aashto["K_gamma"], coeff_aashto["K_q"] if allow_qc_to_en_aashto else 0.0,
+                                   coeff_aashto["K_c"] if allow_qc_to_en_aashto else 0.0, nr=aask_nr)
+                    except Exception:
+                        insert_row("AASHTO active", None, uq_h, uq_d, 0.0, None, None, None, None, None, None, nr=aask_nr)
+                else:
+                    insert_row("AASHTO active", None, uq_h, uq_d, 0.0, None, None, None, None, None, None, nr=aask_nr)
 
                 if ena_prof["z"]:
                     try:
@@ -1731,6 +1957,9 @@ class App:
                             layer_at_z(layers, max(zq,1e-9))["phi"], beta, alpha, delta_d,
                             pren_theta_eq(kh, svq_h, uq_h)
                         )
+                        if allow_qc_to_en_aashto:
+                            Kq_use, Kc_use = derive_pren_qc_from_K(coeff_en_a["K_gamma"], layer_at_z(layers, max(zq,1e-9))["phi"], beta, "active")
+                            coeff_en_a = {**coeff_en_a, "K_q": Kq_use, "K_c": Kc_use}
                         sigma_eff = coeff_en_a["K_gamma"] * (1.0 - en_kv) * effq
                         kq_term = coeff_en_a["K_q"] * en_q
                         kc_term = coeff_en_a["K_c"] * layer_at_z(layers, max(zq,1e-9))["c"] if en_use_c else 0.0
@@ -1765,30 +1994,33 @@ class App:
                     nr=prena_nr
                 )
 
-                if aashto_prof is not None and aashto_prof.get("z"):
-                    try:
-                        coeff_aashto = en_active_coeffs_with_theta(
-                            layer_at_z(layers, max(zq,1e-9))["phi"], beta, alpha, delta_d,
-                            pren_theta_eq(kh_a, svq_h, uq_h)
-                        )
-                        sigma_eff = coeff_aashto["K_gamma"] * (1.0 - aashto_kv) * effq
-                        kq_term = coeff_aashto["K_q"] * aashto_q
-                        kc_term = coeff_aashto["K_c"] * layer_at_z(layers, max(zq,1e-9))["c"] if aashto_use_c else 0.0
-                        sigma_total = sigma_eff + uq_h + uq_d + kq_term - kc_term
-                        insert_row("AASHTO active", sigma_eff, uq_h, uq_d, 0.0, kq_term, kc_term, sigma_total,
-                                   coeff_aashto["K_gamma"], coeff_aashto["K_q"] if allow_qc_to_en_aashto else 0.0,
-                                   coeff_aashto["K_c"] if allow_qc_to_en_aashto else 0.0, nr=aask_nr)
-                    except Exception:
-                        insert_row("AASHTO active", None, uq_h, uq_d, 0.0, None, None, None, None, None, None, nr=aask_nr)
+                if cutp is not None:
+                    cut_sigma_raw = interpolate_piecewise(cutp["z"], cutp["sigma_raw"], zq)
+                    cut_u = interpolate_piecewise(cutp["z"], cutp["u"], zq)
+                    cut_ud = interpolate_piecewise(cutp["z"], cutp["ud"], zq)
+                    cut_qterm = interpolate_piecewise(cutp["z"], cutp["qterm"], zq)
+                    cut_kg = interpolate_piecewise(cutp["z"], cutp["K_gamma"], zq)
+                    cut_kq = interpolate_piecewise(cutp["z"], cutp["K_q"], zq)
+                    cut_sigma_eff = cut_sigma_raw - cut_qterm - cut_u - cut_ud
+                    if cut_sigma_raw < 0.0:
+                        insert_row("CUT passive", "Tension", cut_u, cut_ud, 0.0,
+                                   cut_qterm, 0.0, "Tension", cut_kg, cut_kq, 0.0)
+                    else:
+                        insert_row("CUT passive", cut_sigma_eff, cut_u, cut_ud, 0.0,
+                                   cut_qterm, 0.0, cut_sigma_raw, cut_kg, cut_kq, 0.0)
                 else:
-                    insert_row("AASHTO active", None, uq_h, uq_d, 0.0, None, None, None, None, None, None, nr=aask_nr)
+                    insert_row("CUT passive", None, uq_h, uq_d, 0.0, None, None, None, None, None, None)
 
+                insert_row("AASHTO passive", None, None, None, None, None, None, None, None, None, None, na=True)
                 if enp_prof["z"]:
                     try:
                         coeff_en_p = en_passive_coeffs_with_theta(
                             layer_at_z(layers, max(zq,1e-9))["phi"], beta, alpha,
                             pren_theta_eq(kh, svq_h, uq_h)
                         )
+                        if allow_qc_to_en_aashto:
+                            Kq_use, Kc_use = derive_pren_qc_from_K(coeff_en_p["K_gamma"], layer_at_z(layers, max(zq,1e-9))["phi"], beta, "passive")
+                            coeff_en_p = {**coeff_en_p, "K_q": Kq_use, "K_c": Kc_use}
                         sigma_eff = coeff_en_p["K_gamma"] * (1.0 + en_kv) * effq
                         kq_term = coeff_en_p["K_q"] * en_q
                         kc_term = coeff_en_p["K_c"] * layer_at_z(layers, max(zq,1e-9))["c"] if en_use_c else 0.0
@@ -1823,38 +2055,26 @@ class App:
                     nr=prenp_nr
                 )
 
-                if cuta is not None:
-                    iz = min(range(len(cuta["z"])), key=lambda i: abs(cuta["z"][i] - zq))
-                    insert_row("CUT active", cuta["sigma"][iz] - cuta["qterm"][iz] - cuta["u"][iz] - cuta["ud"][iz], cuta["u"][iz], cuta["ud"][iz], 0.0,
-                               cuta["qterm"][iz], 0.0, cuta["sigma"][iz], cuta["K_gamma"][iz], cuta["K_q"][iz], 0.0)
-                else:
-                    insert_row("CUT active", None, uq_h, uq_d, 0.0, None, None, None, None, None, None)
-
-                if cutp is not None:
-                    iz = min(range(len(cutp["z"])), key=lambda i: abs(cutp["z"][i] - zq))
-                    insert_row("CUT passive", cutp["sigma"][iz] - cutp["qterm"][iz] - cutp["u"][iz] - cutp["ud"][iz], cutp["u"][iz], cutp["ud"][iz], 0.0,
-                               cutp["qterm"][iz], 0.0, cutp["sigma"][iz], cutp["K_gamma"][iz], cutp["K_q"][iz], 0.0)
-                else:
-                    insert_row("CUT passive", None, uq_h, uq_d, 0.0, None, None, None, None, None, None)
-
-                insert_row("AASHTO passive", None, None, None, None, None, None, None, None, None, None, na=True)
             populate_z_tree(self.z_tree, self.z_query.get())
             populate_z_tree(self.z_tree_copy, self.z_query_data.get())
+            trace_text_active = build_cut_trace_for_z_mode(
+                self.z_query_trace.get(), "active", layers, H, beta, kh, kv, gamma_w, zwt, q,
+                inner_flow, retained_water_mode
+            )
+            trace_text_passive = build_cut_trace_for_z_mode(
+                self.z_query_trace.get(), "passive", layers, H, beta, kh, kv, gamma_w, zwt, q,
+                inner_flow, retained_water_mode
+            )
+            self._set_text(self.text_trace_active, trace_text_active)
+            self._set_text(self.text_trace_passive, trace_text_passive)
 
             # merged resultant summary for Report tab
             self.tree_summary.insert("", "end", values=(
-                "EN 1998-5",
-                _fmt_res3(Ed_a, nr=ena_nr),
-                _fmt_res3(yEd_a, nr=ena_nr),
-                _fmt_res3(Ed_p, nr=enp_nr),
-                _fmt_res3(yEd_p, nr=enp_nr)
-            ))
-            self.tree_summary.insert("", "end", values=(
-                "prEN 1998-5",
-                _fmt_res3(prena['P'] if prena else None, nr=prena_nr),
-                _fmt_res3(prena['ybar_base'] if prena else None, nr=prena_nr),
-                _fmt_res3(prenp['P'] if prenp else None, nr=prenp_nr),
-                _fmt_res3(prenp['ybar_base'] if prenp else None, nr=prenp_nr)
+                "CUT",
+                _fmt_res3(cuta['P'] if cuta else None),
+                _fmt_res3(cuta['ybar_base'] if cuta else None),
+                _fmt_res3(cutp['P'] if cutp else None),
+                _fmt_res3(cutp['ybar_base'] if cutp else None)
             ))
             self.tree_summary.insert("", "end", values=(
                 "AASHTO",
@@ -1864,11 +2084,18 @@ class App:
                 "N/A"
             ))
             self.tree_summary.insert("", "end", values=(
-                "CUT",
-                _fmt_res3(cuta['P'] if cuta else None),
-                _fmt_res3(cuta['ybar_base'] if cuta else None),
-                _fmt_res3(cutp['P'] if cutp else None),
-                _fmt_res3(cutp['ybar_base'] if cutp else None)
+                "EN1998-5",
+                _fmt_res3(Ed_a, nr=ena_nr),
+                _fmt_res3(yEd_a, nr=ena_nr),
+                _fmt_res3(Ed_p, nr=enp_nr),
+                _fmt_res3(yEd_p, nr=enp_nr)
+            ))
+            self.tree_summary.insert("", "end", values=(
+                "prEN1998-5",
+                _fmt_res3(prena['P'] if prena else None, nr=prena_nr),
+                _fmt_res3(prena['ybar_base'] if prena else None, nr=prena_nr),
+                _fmt_res3(prenp['P'] if prenp else None, nr=prenp_nr),
+                _fmt_res3(prenp['ybar_base'] if prenp else None, nr=prenp_nr)
             ))
 
             # geometry / plots
@@ -1916,6 +2143,7 @@ class App:
                     label="CUT passive", color=METHOD_COLORS["CUT passive"]
                 )
             for ax, title, xlabel in [(self.axd1, "Active-side distributions", "Active earth pressure (kPa)"), (self.axd2, "Passive-side distributions", "Passive earth pressure (kPa)")]:
+                ax.axvline(0.0, color="black", linewidth=3.2, alpha=0.95)
                 ax.invert_yaxis(); ax.set_title(title); ax.set_xlabel(xlabel); ax.set_ylabel("Depth from top (m)"); ax.grid(True, alpha=0.3)
                 if ax.lines: ax.legend(loc="best")
             self.canvas_dist.draw()
@@ -1925,6 +2153,8 @@ class App:
             msg = f"Warnings\n• {e}\n\n{traceback.format_exc()}"
             self._set_text(self.text_active, msg)
             self._set_text(self.text_passive, msg)
+            self._set_text(self.text_trace_active, msg)
+            self._set_text(self.text_trace_passive, msg)
 
 if __name__ == "__main__":
     root = tk.Tk()

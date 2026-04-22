@@ -156,19 +156,38 @@ def layer_at_z(layers, z):
 
 def sigma_v_u_layered(z, layers, zwt, gamma_w):
     sv = 0.0
+
     for layer in layers:
         a, b = layer["z0"], layer["z1"]
+
+        # πόσο από το στρώμα συμμετέχει μέχρι το βάθος z
         seg = max(0.0, min(z, b) - a)
         if seg <= 0:
             continue
+
+        # όλο το τμήμα πάνω από τη στάθμη νερού
         if zwt >= b:
             sv += layer["gd"] * seg
+
+        # όλο το τμήμα κάτω από τη στάθμη νερού
         elif zwt <= a:
             sv += layer["gs"] * seg
+
+        # η στάθμη νερού περνάει μέσα από το στρώμα
         else:
-            sv += layer["gd"] * (zwt - a) + layer["gs"] * (b - zwt if z >= b else z - zwt)
+            if z <= zwt:
+                # το εξεταζόμενο σημείο είναι ακόμη πάνω από το νερό
+                sv += layer["gd"] * (z - a)
+            elif z >= b:
+                # έχει διαπεραστεί όλο το στρώμα
+                sv += layer["gd"] * (zwt - a) + layer["gs"] * (b - zwt)
+            else:
+                # το σημείο είναι μέσα στο βρεγμένο τμήμα του στρώματος
+                sv += layer["gd"] * (zwt - a) + layer["gs"] * (z - zwt)
+
             if z < b:
                 break
+
     u = 0.0 if z <= zwt else gamma_w * (z - zwt)
     return sv, u
     
@@ -472,21 +491,21 @@ def cut_profile(mode, layers, H, beta_deg, alphaH, av, gamma_w, zwt, q,
             cm_vals.append(c_m)
 
         except Exception:
-            sigma.append(0.0)
-            sigma_raw.append(0.0)
-            sigma_res.append(0.0)
+            sigma.append(float("nan"))      # να μη φαίνεται ψεύτικο 0 στο διάγραμμα
+            sigma_raw.append(float("nan"))
+            sigma_res.append(0.0)           # να μη συμμετέχει στη συνισταμένη
             tension_flags.append(False)
-            theta_vals.append(0.0)
-            Kg.append(0.0)
-            Kq.append(0.0)
-            Kc.append(0.0)
-            qterm.append(0.0)
-            cterm.append(0.0)
+            theta_vals.append(float("nan"))
+            Kg.append(float("nan"))
+            Kq.append(float("nan"))
+            Kc.append(float("nan"))
+            qterm.append(float("nan"))
+            cterm.append(float("nan"))
             uvals.append(u_h)
             udvals.append(u_d)
             svvals.append(sv)
-            phim_vals.append(0.0)
-            cm_vals.append(0.0)
+            phim_vals.append(float("nan"))
+            cm_vals.append(float("nan"))
 
     P, ybar = positive_resultant_from_arrays(zvals, sigma_res)
 

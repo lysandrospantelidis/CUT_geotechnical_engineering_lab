@@ -149,7 +149,7 @@
       "asset_name_contains": "cut-seismic-earth-pressure-toolkit",
       "asset_ext": ".exe",
       "release_tag_contains": "cut-seismic-earth-pressure-toolkit",
-      "tracking_id": "cut_seismic_earth_pressure_toolkit",
+      "tracking_id": "cut_seismic_earth_pressure_toolkit_v16_3",
       "tracking_category": "earth_pressure",
       "tracking_type": "desktop_app"
     },

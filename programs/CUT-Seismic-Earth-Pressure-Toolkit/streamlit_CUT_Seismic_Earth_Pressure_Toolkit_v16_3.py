@@ -146,7 +146,13 @@ def sigma_v_u_layered(z, layers, zwt, gamma_w):
         elif zwt <= a:
             sv += layer["gs"] * seg
         else:
-            sv += layer["gd"] * (zwt - a) + layer["gs"] * (b - zwt if z >= b else z - zwt)
+            if z <= zwt:
+                sv += layer["gd"] * (z - a)
+            elif z >= b:
+                sv += layer["gd"] * (zwt - a) + layer["gs"] * (b - zwt)
+            else:
+                sv += layer["gd"] * (zwt - a) + layer["gs"] * (z - zwt)
+
             if z < b:
                 break
     u = 0.0 if z <= zwt else gamma_w * (z - zwt)
@@ -553,21 +559,21 @@ def cut_profile(mode, layers, H, beta_deg, alphaH, av, gamma_w, zwt, q,
             phim_vals.append(phim["phi_m_deg"])
             cm_vals.append(c_m)
         except Exception:
-            sigma.append(0.0)
-            sigma_raw.append(0.0)
+            sigma.append(float("nan"))
+            sigma_raw.append(float("nan"))
             sigma_res.append(0.0)
             tension_flags.append(False)
-            theta_vals.append(0.0)
-            Kg.append(0.0)
-            Kq.append(0.0)
-            Kc.append(0.0)
-            qterm.append(0.0)
-            cterm.append(0.0)
+            theta_vals.append(float("nan"))
+            Kg.append(float("nan"))
+            Kq.append(float("nan"))
+            Kc.append(float("nan"))
+            qterm.append(float("nan"))
+            cterm.append(float("nan"))
             uvals.append(u_h)
             udvals.append(u_d)
             svvals.append(sv)
-            phim_vals.append(0.0)
-            cm_vals.append(0.0)
+            phim_vals.append(float("nan"))
+            cm_vals.append(float("nan"))
 
     P, ybar = positive_resultant_from_arrays(zvals, sigma_res)
     return {
